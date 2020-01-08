@@ -16,7 +16,7 @@
             You can easily check this in PlayStore - app - About the app - App permissions - see more. <b>Paranoid Diary</b> is NOT
             using the network, or write anything to shared storage on the phone. The only way you can get any data out of
             <b>Paranoid Diary</b> is by your deliberate and explicit action (sharing to other app, or backup).</li>
-            <li>The source code of the application is open and is publicly available at https://ftsdesign.biz. You can verify it by yourself,
+            <li>The source code of the application is open and is publicly available at https://github.com/ftsdesign/paranoid-diary. You can verify it by yourself,
             or build your own copy. This link is also the place to report bugs or vote for the new features.</li>
             <li>All textual information (text of your records or tags) is <i>&quot;encrypted at rest&quot;</i> with 256 bit RSA algorithm,
             so even if someone can get access to the app private storage space, the text will not be revealed. An important consequence

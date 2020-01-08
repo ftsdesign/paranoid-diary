@@ -158,14 +158,15 @@ public class MainActivity extends AppCompatActivity
                     .setIcon(R.drawable.ic_action_lock)
                     .setView(input)
                     .setPositiveButton(android.R.string.yes, (dialog, whichButton) -> {
-                        TransientPasswordStorage.setPassword(input.getText().toString());
-                        if (!dataStorageService.isPasswordCorrect()) {
-                            TransientPasswordStorage.clear();
-                            Toast toast = Toast.makeText(MainActivity.this, getString(R.string.incorrect_password), Toast.LENGTH_LONG);
-                            toast.show();
-                            getPasswordFromUser();
-                        } else {
-                            onPasswordUnlocked();
+                        if (TransientPasswordStorage.setPassword(input.getText().toString())) {
+                            if (!dataStorageService.isPasswordCorrect()) {
+                                TransientPasswordStorage.clear();
+                                Toast toast = Toast.makeText(MainActivity.this, getString(R.string.incorrect_password), Toast.LENGTH_LONG);
+                                toast.show();
+                                getPasswordFromUser();
+                            } else {
+                                onPasswordUnlocked();
+                            }
                         }
                     })
                     .setNegativeButton(android.R.string.no, null).show();
@@ -538,8 +539,9 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onSetInitPassword(String password) {
-        TransientPasswordStorage.setPassword(password);
-        dataStorageService.savePwdCheck();
-        onPasswordUnlocked();
+        if (TransientPasswordStorage.setPassword(password)) {
+            dataStorageService.savePwdCheck();
+            onPasswordUnlocked();
+        }
     }
 }

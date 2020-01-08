@@ -20,14 +20,21 @@ public class TransientPasswordStorage {
     private static final Timer timer = new Timer("PassExpiryTimer");
     private static TimerTask clearPasswordTask = null;
 
-    public static synchronized void setPassword(@Nullable String password) {
+    /**
+     *
+     * @param password Password to set
+     * @return true if the password was set, false otherwise
+     */
+    public static synchronized boolean setPassword(@Nullable String password) {
         if (password == null || password.trim().isEmpty()) {
-            throw new IllegalArgumentException("Password must be not empty, or use clear() to clear it");
+            Log.w(TransientPasswordStorage.class.getSimpleName(), "Password must be not empty, or use clear() to clear it");
+            return false;
         }
         pass = password.toCharArray();
         Log.i(TransientPasswordStorage.class.getSimpleName(), "Password is set");
         updateTime();
         fireOnPasswordSet();
+        return true;
     }
 
     private static void updateTime() {

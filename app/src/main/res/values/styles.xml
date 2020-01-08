@@ -1,0 +1,63 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.DayNight.DarkActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:windowBackground">@color/textBackground</item>
+    </style>
+
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="android:textColorPrimary">@color/colorTitle</item>
+    </style>
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Dark">
+        <item name="android:background">@color/colorPrimary</item>
+    </style>
+
+    <style name="RecordHeader" parent="@android:style/Widget.TextView">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">@dimen/base_font_size</item>
+        <item name="android:textColor">@color/colorAccent</item>
+    </style>
+
+    <style name="RecordBody" parent="@android:style/Widget.TextView">
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <style name="RecordBodyTag" parent="RecordBody">
+        <item name="android:textColor">@color/colorAccent</item>
+    </style>
+
+    <style name="TagButton">
+        <item name="android:background">@color/textBackgroundSelected</item>
+        <item name="android:padding">2sp</item>
+        <item name="android:layout_marginTop">4sp</item>
+        <item name="android:layout_marginRight">4sp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">@dimen/base_font_size</item>
+        <item name="android:textColor">@color/tag</item>
+    </style>
+
+    <style name="RecordTags" parent="@android:style/Widget.TextView">
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">@dimen/base_font_size</item>
+        <item name="android:textColor">@color/tag</item>
+    </style>
+
+    <style name="RecordGeoTag" parent="@android:style/Widget.TextView">
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">@dimen/base_font_size</item>
+        <item name="android:textColor">@color/geotag</item>
+    </style>
+
+    <dimen name="base_font_size">18sp</dimen>
+    <dimen name="dialog_padding">8sp</dimen>
+</resources>

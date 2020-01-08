@@ -1,0 +1,63 @@
+<!--
+  ~ Copyright 2018 The app Open Source Project
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~      http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory app:title="@string/appearance_header">
+
+        <!--
+        <EditTextPreference
+            app:key="signature"
+            app:title="@string/signature_title"
+            app:useSimpleSummaryProvider="true" />
+            -->
+
+        <ListPreference
+            app:defaultValue="reply"
+            app:entries="@array/theme_entries"
+            app:entryValues="@array/theme_values"
+            app:key="@string/pref_theme"
+            app:title="@string/color_theme"
+            app:useSimpleSummaryProvider="true" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/permissions">
+
+        <SwitchPreferenceCompat
+            app:key="@string/pref_key_geotagging_enabled"
+            app:title="@string/enable_geotagging"
+            app:summary="@string/enable_geotagging_summary"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/data_header">
+
+        <Preference app:title="@string/pref_change_password"
+            app:key="@string/pref_key_change_password"
+            app:summary="@string/pref_change_password_summary"/>
+
+        <Preference app:title="@string/pref_backup"
+            app:key="@string/pref_key_backup"
+            app:summary="@string/pref_backup_summary"/>
+
+        <Preference app:title="@string/pref_delete_all_data"
+            app:key="@string/pref_key_delete_all_data"
+            app:summary="@string/pref_delete_all_data_summary"/>
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

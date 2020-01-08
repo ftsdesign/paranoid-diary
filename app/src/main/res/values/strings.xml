@@ -1,0 +1,102 @@
+<resources>
+    <string name="app_name">Paranoid Diary</string>
+    <string name="title_activity_settings">PD:Settings</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_about">PD:About</string>
+    <string name="action_about">About</string>
+    <string name="title_activity_write">PD:Write</string>
+    <string name="about_text"><![CDATA[
+        <p>Your mobile device is not a good place to keep secrets. If the government, tech giants, or bandits with guns
+        will target you specifically, nothing can save you. What you can protect from is amateur hackers
+        and indiscriminate data mining - and this is what <b>Paranoid Diary</b> can help you with.</p>
+
+        <h1>How can we prove that?</h1>
+        <ul>
+            <li>The app is not asking for any permissions, other than location - which is used only if you enable the geotagging feature.
+            You can easily check this in PlayStore - app - About the app - App permissions - see more. <b>Paranoid Diary</b> is NOT
+            using the network, or write anything to shared storage on the phone. The only way you can get any data out of
+            <b>Paranoid Diary</b> is by your deliberate and explicit action (sharing to other app, or backup).</li>
+            <li>The source code of the application is open and is publicly available at https://ftsdesign.biz. You can verify it by yourself,
+            or build your own copy. This link is also the place to report bugs or vote for the new features.</li>
+            <li>All textual information (text of your records or tags) is <i>&quot;encrypted at rest&quot;</i> with 256 bit RSA algorithm,
+            so even if someone can get access to the app private storage space, the text will not be revealed. An important consequence
+            of this is that if you forget your password, there is absolutely no way to recover your data.</li>
+            <li>For backup, password protected ZIP file is used. One of the recommended ways of extracting the backup is
+            to share it directly with a trusted device over Bluetooth, avoiding using any online services.</li>
+        </ul>
+
+        <p><b>Paranoid Diary</b> is <b>NOT</b> for the diary you want to share publicly. It is to keep track of your very personal
+        thoughts, which you want to keep to yourself.</p>
+
+        <h1>Key features</h1>
+        <ul>
+            <li>Work offline - <b>Paranoid Diary</b> is not using the network at all.</li>
+            <li>Easily find the previous records on the same subject by using tags.</li>
+            <li>Diary records are immutable. You can delete a record entirely,
+            but you cannot rewrite your history.</li>
+        </ul>
+
+        ]]></string>
+    <string name="write_here">Write here</string>
+
+    <!-- Preference Titles -->
+    <string name="appearance_header">Appearance</string>
+    <string name="data_header">Data</string>
+    <string name="color_theme">Color scheme</string>
+
+    <!-- Sync Preferences -->
+    <string name="pref_delete_all_data">Delete all data</string>
+    <string name="pref_delete_all_data_summary">Irreversibly removes all your diary records</string>
+    <string name="confirm">Confirm</string>
+    <string name="delete_all_confirm">Do you really want to delete your whole diary?</string>
+    <string name="action_share">Share</string>
+    <string name="enter_password">Enter password</string>
+    <string name="incorrect_password">Incorrect password, try again</string>
+    <string name="lock">Lock</string>
+    <string name="unlock">Unlock</string>
+    <string name="action_export">Export as password protected zip</string>
+    <string name="pref_theme">theme</string>
+    <string name="deleting_all_data">Deleting all data…</string>
+    <string name="settings_password">Enter password:</string>
+    <string name="settings_password2">Repeat password:</string>
+    <string name="cancel">Cancel</string>
+    <string name="export">Export</string>
+    <string name="passwords_dont_match">Passwords don\'t match</string>
+    <string name="password_cant_be_empty">Password cannot be empty</string>
+    <string name="set_password_for_zip_file">Set password for zip file</string>
+    <string name="pref_backup">Backup</string>
+    <string name="pref_backup_summary">Save your whole diary in a zip file</string>
+    <string name="settings_output_format">Output format:</string>
+    <string name="permissions">Permissions</string>
+    <string name="enable_geotagging">Enable auto geotagging</string>
+    <string name="enable_geotagging_summary">Diary records will be automatically geotagged with the current location</string>
+    <string name="pref_key_geotagging_enabled">pref_key_geotagging_enabled</string>
+    <string name="pref_key_backup">backup</string>
+    <string name="pref_key_delete_all_data">delete_all_data</string>
+    <string name="action_delete">Delete</string>
+    <string name="pref_change_password">Change password</string>
+    <string name="pref_key_change_password">pref_key_change_password</string>
+    <string name="pref_change_password_summary">Might take long time, depending on the size of your diary</string>
+    <string name="settings_old_password">Old password:</string>
+    <string name="settings_new_password">New password:</string>
+    <string name="settings_repeat_new_password">Repeat new password:</string>
+    <string name="change_password_dialog_title">Change password</string>
+    <string name="new_pass_must_be_different">New password cannot be the same as the old one</string>
+    <string name="incorrect_old_password">Old password is incorrect</string>
+    <string name="new_passwords_dont_match">New passwords don\'t match</string>
+    <string name="action_filter">Filter</string>
+    <string name="action_tag">Tag</string>
+    <string name="set_tags">Set tags</string>
+    <string name="records_affected">Records affected: %d</string>
+    <string name="title_activity_main">PD</string>
+    <string name="setup">Setup</string>
+    <string name="done">Done</string>
+    <string name="are_you_sure_delete_record">Are you sure you want to permanently delete record %s \"%s\"?</string>
+    <string name="toast_records_deleted">Records deleted: %d</string>
+    <string name="new_tag">New tag</string>
+
+    <string-array name="backup_formats_array">
+        <item>Text</item>
+        <item>JSON</item>
+    </string-array>
+</resources>

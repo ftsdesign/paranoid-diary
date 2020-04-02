@@ -22,8 +22,12 @@ import biz.ftsdesign.paranoiddiary.model.Tag;
 import biz.ftsdesign.paranoiddiary.predicate.TagPredicate;
 
 class Util {
-    static void toastException(Activity activity, Exception e) {
+    static void toastException(@NonNull Activity activity, @NonNull Exception e) {
         String message = e.getMessage() != null ? e.getMessage() : e.toString();
+        toastError(activity, message);
+    }
+
+    static void toastError(@NonNull Activity activity, @NonNull String message) {
         Log.e(activity.getClass().getCanonicalName(), message);
         Toast toast = Toast.makeText(activity.getApplicationContext(), message, Toast.LENGTH_SHORT);
         toast.show();

@@ -40,8 +40,8 @@ public class WriteActivity extends AppCompatActivity implements ModifyTagsListen
     private static final String TAG_TAG_DIALOG_FRAGMENT = "TagDialogFragment";
     private long lastSaved = 0;
     private DataStorageService dataStorageService;
-    private long recordId;
-    private Record record;
+    private long recordId; // Set in onCreate
+    private Record record = null;
     private Timer timer = new Timer();
     private TimerTask saveTextOnUpdateTimerTask = null;
 
@@ -50,7 +50,7 @@ public class WriteActivity extends AppCompatActivity implements ModifyTagsListen
         public void onServiceConnected(ComponentName name, IBinder service) {
             DataStorageService.DataStorageServiceBinder binder = (DataStorageService.DataStorageServiceBinder) service;
             dataStorageService = binder.getService();
-            initRecord();
+            initUiFromRecord(recordId);
         }
 
         @Override
@@ -59,17 +59,22 @@ public class WriteActivity extends AppCompatActivity implements ModifyTagsListen
         }
     };
 
-    private void initRecord() {
+    private void initUiFromRecord(final long recordId) {
         if (dataStorageService != null) {
             record = dataStorageService.getRecord(recordId);
-            EditText editText = findViewById(R.id.textViewRecordText);
-            if (editText != null && editText.getText() == null) { // Don't restore if there's text already
-                editText.setText(record.getText());
-            }
-            TextView textViewTimestamp = findViewById(R.id.textViewWriteTimestamp);
-            if (textViewTimestamp != null) {
-                Date date = new Date(record.getTimeCreated());
-                textViewTimestamp.setText(Formats.TIMESTAMP_FORMAT.format(date));
+            if (record == null) {
+                Util.toastError(this, "Record id=" + recordId + " not found");
+
+            } else {
+                EditText editText = findViewById(R.id.textViewRecordText);
+                if (editText != null && editText.getText() == null) { // Don't restore if there's text already
+                    editText.setText(record.getText());
+                }
+                TextView textViewTimestamp = findViewById(R.id.textViewWriteTimestamp);
+                if (textViewTimestamp != null) {
+                    Date date = new Date(record.getTimeCreated());
+                    textViewTimestamp.setText(Formats.TIMESTAMP_FORMAT.format(date));
+                }
             }
         }
     }
@@ -130,13 +135,13 @@ public class WriteActivity extends AppCompatActivity implements ModifyTagsListen
     }
 
     private void onTextChanged() {
-        updateRecordFromUI();
+        updateRecordFromUI(record);
 
         final long now = System.currentTimeMillis();
         final long timeSinceLastSavedMs = now - lastSaved;
         if (timeSinceLastSavedMs > MIN_AUTOSAVE_INTERVAL_MS) {
             // Enough time has passed since last save, can save immediately
-            saveCurrentRecord();
+            saveCurrentRecord(record);
 
         } else {
             // Schedule save later, if not already scheduled
@@ -144,7 +149,7 @@ public class WriteActivity extends AppCompatActivity implements ModifyTagsListen
                 saveTextOnUpdateTimerTask = new TimerTask() {
                     @Override
                     public void run() {
-                        saveCurrentRecord();
+                        saveCurrentRecord(record);
                         saveTextOnUpdateTimerTask = null;
                     }
                 };
@@ -162,14 +167,19 @@ public class WriteActivity extends AppCompatActivity implements ModifyTagsListen
 
     private void onFinishedWriting() {
         Log.i(this.getClass().getSimpleName(), "onFinishedWriting");
+        finish();
+    }
+
+    private synchronized void saveBeforeClose(final Record record) {
+        Log.i(this.getClass().getSimpleName(), "saveBeforeClose");
+        if (record != null) {
+            updateRecordFromUI(record);
+            saveCurrentRecord(record);
+            saveAutoTagsFromText(record);
+        }
         if (saveTextOnUpdateTimerTask != null) {
             saveTextOnUpdateTimerTask.cancel();
         }
-        updateRecordFromUI();
-        saveCurrentRecord();
-        saveAutoTagsFromText(record);
-        record = null;
-        finish();
     }
 
     private void saveAutoTagsFromText(final Record record) {
@@ -187,7 +197,7 @@ public class WriteActivity extends AppCompatActivity implements ModifyTagsListen
         }
     }
 
-    private void saveCurrentRecord() {
+    private synchronized void saveCurrentRecord(final Record record) {
         if (dataStorageService != null && record != null) {
             try {
                 Log.i(WriteActivity.class.getCanonicalName(), "" + record.getText().length());
@@ -207,7 +217,8 @@ public class WriteActivity extends AppCompatActivity implements ModifyTagsListen
     @Override
     protected void onDestroy() {
         Log.i(this.getClass().getCanonicalName(), "onDestroy");
-        onFinishedWriting();
+        saveBeforeClose(record);
+        record = null;
         super.onDestroy();
     }
 
@@ -222,20 +233,18 @@ public class WriteActivity extends AppCompatActivity implements ModifyTagsListen
     @Override
     protected void onStop() {
         Log.i(this.getClass().getCanonicalName(), "onStop");
-        saveCurrentRecord();
+        saveBeforeClose(record); // Don't clear the record as we might restart
         super.onStop();
         unbindService(connection);
     }
 
-    private void updateRecordFromUI() {
-        if (record != null) {
-            EditText editText = findViewById(R.id.textViewRecordText);
-            if (editText != null) {
-                String newText = editText.getText().toString().trim();
-                if (!newText.equals(record.getText())) {
-                    record.setText(newText);
-                    record.setTimeUpdated(System.currentTimeMillis());
-                }
+    private void updateRecordFromUI(final Record record) {
+        EditText editText = findViewById(R.id.textViewRecordText);
+        if (editText != null) {
+            String newText = editText.getText().toString().trim();
+            if (record != null) {
+                record.setText(newText);
+                record.setTimeUpdated(System.currentTimeMillis());
             }
         }
     }

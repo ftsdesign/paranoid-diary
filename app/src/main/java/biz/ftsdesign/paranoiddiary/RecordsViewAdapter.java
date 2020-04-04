@@ -198,7 +198,8 @@ class RecordsViewAdapter extends RecyclerView.Adapter<RecordsViewAdapter.RecordV
         }
     }
 
-    private void updateRecord(long recordId) {
+    private void updateRecord(final long recordId) {
+        Log.i(this.getClass().getSimpleName(), "Updating record #" + recordId);
         // Reload the latest changes from the database
         final Record record = dataStorageService.getRecord(recordId);
         if (record != null) {

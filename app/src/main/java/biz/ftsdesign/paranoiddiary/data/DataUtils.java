@@ -1,5 +1,7 @@
 package biz.ftsdesign.paranoiddiary.data;
 
+import androidx.annotation.NonNull;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -20,16 +22,17 @@ public class DataUtils {
     public static final int DEFAULT_DIARY_ID = 1;
     public static final Pattern PATTERN_HASHTAG = Pattern.compile("#\\w+");
 
-    public static SortedSet<String> extractTags(String text) {
-        SortedSet<String> tags = new TreeSet<>();
+    @NonNull
+    public static SortedSet<String> extractTags(@NonNull String text) {
+        SortedSet<String> tagNames = new TreeSet<>();
         Matcher m = PATTERN_HASHTAG.matcher(text);
         while (m.find()) {
             String tagText = m.group();
             if (tagText.startsWith("#") && tagText.length() > 1) {
-                tags.add(tagText.substring(1));
+                tagNames.add(tagText.substring(1));
             }
         }
-        return tags;
+        return tagNames;
     }
 
     static byte[] assemble(byte[]... byteArrays) {

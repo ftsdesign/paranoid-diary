@@ -57,13 +57,13 @@ public class DataStorageService extends Service implements PasswordListener {
         return record;
     }
 
-    public synchronized void update(@NonNull Record record) throws GeneralSecurityException {
+    public synchronized void updateRecordAndTags(@NonNull Record record) throws GeneralSecurityException {
         if (!TransientPasswordStorage.isSet())
             return;
         Log.i(this.getClass().getSimpleName(), "update " + record);
         record.setTimeUpdated(System.currentTimeMillis());
         dbHelper.updateTextAndTimestamp(record, crypto);
-        dbHelper.updateTags(record);
+        dbHelper.updateRecordTagMappings(record);
     }
 
     public synchronized Record createNewRecord(@NonNull Record record) throws GeneralSecurityException {
@@ -72,7 +72,7 @@ public class DataStorageService extends Service implements PasswordListener {
         record.setTimeCreated(System.currentTimeMillis());
         record.setTimeUpdated(record.getTimeCreated());
         Record out = dbHelper.create(record, crypto);
-        dbHelper.updateTags(record);
+        dbHelper.updateRecordTagMappings(record);
         reloadRecordTagMappings();
         Log.i(this.getClass().getCanonicalName(), "createNewRecord completed " + out);
         return out;
@@ -91,7 +91,7 @@ public class DataStorageService extends Service implements PasswordListener {
         recordIdToTagIds = dbHelper.getAllRecordTagMappings();
     }
 
-    private void populateRecordsWithTags(@NonNull List<Record> records) {
+    private void populateRecordsWithTags(@NonNull final List<Record> records) {
         ensureAllTagsLoaded();
         reloadRecordTagMappings();
         Map<Long,Record> idToRecord = new HashMap<>();
@@ -99,15 +99,18 @@ public class DataStorageService extends Service implements PasswordListener {
             idToRecord.put(record.getId(), record);
         }
 
+        int tagsCount = 0;
         for (Map.Entry<Long, List<Long>> entry : recordIdToTagIds.entrySet()) {
             Record record = idToRecord.get(entry.getKey());
             for (long tagId : entry.getValue()) {
                 Tag tag = getTagById(tagId);
                 if (record != null && tag != null) {
                     record.getTags().add(tag);
+                    tagsCount++;
                 }
             }
         }
+        Log.i(this.getClass().getSimpleName(), "Populated " + records.size() + " records with " + tagsCount + " tags");
     }
 
     @Nullable
@@ -130,7 +133,7 @@ public class DataStorageService extends Service implements PasswordListener {
             return;
         Log.i(this.getClass().getCanonicalName(), "delete " + recordId);
         dbHelper.deleteRecord(recordId);
-        dbHelper.clearTags(recordId);
+        dbHelper.clearTagsForRecord(recordId);
         reloadRecordTagMappings();
     }
 
@@ -213,11 +216,6 @@ public class DataStorageService extends Service implements PasswordListener {
             Log.w(this.getClass().getSimpleName(), "Password is not set");
         }
         return out;
-    }
-
-    public synchronized void updateTags(@NonNull Record record) {
-        dbHelper.updateTags(record);
-        reloadRecordTagMappings();
     }
 
     public synchronized void deleteRecords(@NonNull List<Record> recordsToDelete) {

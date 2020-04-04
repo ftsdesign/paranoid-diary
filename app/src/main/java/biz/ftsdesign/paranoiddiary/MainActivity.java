@@ -112,7 +112,6 @@ public class MainActivity extends AppCompatActivity
 
     private void loadAllRecordsNoText() {
         try {
-            Log.i(this.getClass().getSimpleName(), "starting onRecordsUpdateFinished");
             onRecordsUpdateFinished(dataStorageService.getAllRecordsNoText(DataUtils.DEFAULT_DIARY_ID));
         } catch (GeneralSecurityException e) {
             Util.toastException(MainActivity.this, e);
@@ -173,13 +172,16 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void onRecordsUpdateFinished(final List<Record> records) {
-        Log.i(this.getClass().getCanonicalName(), "onRecordsUpdateFinished");
-        if (records != null) {
-            Log.i(this.getClass().getCanonicalName(), "records " + records.size());
-            recordsViewAdapter.setRecords(records);
-            onRecordFilterUpdated();
-        }
+    private void onRecordsUpdateFinished(@NonNull final List<Record> records) {
+        Log.i(this.getClass().getSimpleName(), "onRecordsUpdateFinished " + records.size());
+        recordsViewAdapter.setRecords(records);
+        onRecordFilterUpdated();
+    }
+
+    @Override
+    protected void onResume() {
+        Log.i(this.getClass().getSimpleName(), "onResume");
+        super.onResume();
     }
 
     @Override
@@ -193,10 +195,11 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void onNewRecordAdded() {
+        Log.i(this.getClass().getSimpleName(), "onNewRecordAdded");
         if (recordsCountBeforeWrite > 0 && recordsViewAdapter.getItemCountUnfiltered() > recordsCountBeforeWrite) {
+            Log.i(this.getClass().getSimpleName(), "New records: " + recordsViewAdapter.getItemCountUnfiltered() + " > " + recordsCountBeforeWrite);
             RecyclerView recyclerView = findViewById(R.id.recyclerViewRecords);
             if (recyclerView != null) {
-                Log.i(this.getClass().getSimpleName(), "onNewRecordAdded");
                 recordsViewAdapter.onNewRecordAdded();
                 recyclerView.scrollToPosition(0);
             }
@@ -213,7 +216,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.i(this.getClass().getCanonicalName(), "onCreate");
+        Log.i(this.getClass().getSimpleName(), "onCreate");
         // To prevent the activity content to show up in the app thumbnail
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
         super.onCreate(savedInstanceState);
@@ -343,7 +346,7 @@ public class MainActivity extends AppCompatActivity
 
             case R.id.action_toggle_lock:
                 if (TransientPasswordStorage.isSet()) {
-                    Log.i(this.getClass().getCanonicalName(), "Locked on user action");
+                    Log.i(this.getClass().getSimpleName(), "Locked on user action");
                     TransientPasswordStorage.clear();
                 } else {
                     getPasswordFromUser();

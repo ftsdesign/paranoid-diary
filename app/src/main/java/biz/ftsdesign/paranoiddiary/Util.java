@@ -50,7 +50,7 @@ class Util {
     @SuppressLint("SetTextI18n")
     static void setTagsBox(@NonNull Activity activity, @NonNull FlexboxLayout tagsBox,
                            @NonNull Record record, @Nullable RecordPredicateListener recordPredicateListener) {
-        Log.i(Util.class.getSimpleName(), "setTagsBox " + record + " " + record.getTags());
+        Log.d(Util.class.getSimpleName(), "setTagsBox " + record + " " + record.getTags());
         tagsBox.removeAllViewsInLayout();
         if (!record.getTags().isEmpty()) {
             int index = 0;

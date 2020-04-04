@@ -35,7 +35,7 @@ class DBHelper extends SQLiteOpenHelper {
 
     DBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
-        Log.i(this.getClass().getCanonicalName(), "DBHelper created");
+        Log.i(this.getClass().getSimpleName(), "DBHelper created");
     }
 
     @Override
@@ -47,7 +47,7 @@ class DBHelper extends SQLiteOpenHelper {
 //        db.execSQL("DROP TABLE IF EXISTS " + RecordTagTable.TABLE_NAME);
 //        db.execSQL(TagTable.CREATE_TABLE_QUERY);
 //        db.execSQL(RecordTagTable.CREATE_TABLE_QUERY);
-//        Log.i(this.getClass().getCanonicalName(), "====== RT =====");
+//        Log.i(this.getClass().getSimpleName(), "====== RT =====");
     }
 
     void recreateDb() {
@@ -56,7 +56,7 @@ class DBHelper extends SQLiteOpenHelper {
     }
 
     private void dropAllTables(SQLiteDatabase db) {
-        Log.i(this.getClass().getCanonicalName(), "Dropping all tables...");
+        Log.i(this.getClass().getSimpleName(), "Dropping all tables...");
         db.execSQL("DROP TABLE IF EXISTS " + RecordTable.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + TagTable.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + RecordTagTable.TABLE_NAME);
@@ -65,16 +65,16 @@ class DBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        Log.i(this.getClass().getCanonicalName(), "Initializing the database...");
+        Log.i(this.getClass().getSimpleName(), "Initializing the database...");
         try {
             db.execSQL(PwdCheckTable.CREATE_TABLE_QUERY);
             db.execSQL(RecordTable.CREATE_TABLE_QUERY);
             db.execSQL(TagTable.CREATE_TABLE_QUERY);
             db.execSQL(RecordTagTable.CREATE_TABLE_QUERY);
         } catch (Exception e) {
-            Log.e(this.getClass().getCanonicalName(), "Cannot initialize db", e);
+            Log.e(this.getClass().getSimpleName(), "Cannot initialize db", e);
         }
-        Log.i(this.getClass().getCanonicalName(), "Database initialized");
+        Log.i(this.getClass().getSimpleName(), "Database initialized");
     }
 
 //    @Override
@@ -121,7 +121,7 @@ class DBHelper extends SQLiteOpenHelper {
         String[] whereArgs = {String.valueOf(record.getId())};
         int rowsUpdated = db.update(RecordTable.TABLE_NAME, values,  RecordTable._ID + " = ?", whereArgs);
         if (rowsUpdated != 1)
-            Log.wtf(this.getClass().getCanonicalName(), "Rows updated: " + rowsUpdated);
+            Log.wtf(this.getClass().getSimpleName(), "Rows updated: " + rowsUpdated);
     }
 
     void updateTagName(@NonNull final Tag tag, @NonNull final CryptoModule crypto) throws GeneralSecurityException {
@@ -131,7 +131,7 @@ class DBHelper extends SQLiteOpenHelper {
         String[] whereArgs = {String.valueOf(tag.getId())};
         int rowsUpdated = db.update(TagTable.TABLE_NAME, values,  TagTable._ID + " = ?", whereArgs);
         if (rowsUpdated != 1)
-            Log.wtf(this.getClass().getCanonicalName(), "Rows updated: " + rowsUpdated);
+            Log.wtf(this.getClass().getSimpleName(), "Rows updated: " + rowsUpdated);
     }
 
     private void setTagForRecord(@NonNull Record record, @NonNull Tag tag) {
@@ -152,15 +152,13 @@ class DBHelper extends SQLiteOpenHelper {
         db.delete(RecordTagTable.TABLE_NAME, selection, selectionArgs);
     }
 
-    void updateTags(final Record record) {
-        if (record != null) {
-            clearTags(record.getId());
-            Set<Tag> tags = record.getTags();
-            for (Tag tag : tags) {
-                setTagForRecord(record, tag);
-            }
+    void updateRecordTagMappings(@NonNull final Record record) {
+        clearTagsForRecord(record.getId());
+        final Set<Tag> tags = record.getTags();
+        for (Tag tag : tags) {
+            setTagForRecord(record, tag);
         }
-        Log.i(this.getClass().getSimpleName(), "Updated tags for " + record);
+        Log.i(this.getClass().getSimpleName(), "Updated " + tags.size() + " tags for record #" + record.getId());
     }
 
     @NonNull
@@ -183,10 +181,10 @@ class DBHelper extends SQLiteOpenHelper {
                 }
             }
         } catch (Exception e) {
-            Log.e(this.getClass().getCanonicalName(), "Can't get text for #" + recordId, e);
+            Log.e(this.getClass().getSimpleName(), "Can't get text for #" + recordId, e);
         }
         t1 = System.currentTimeMillis() - t1;
-        Log.d(this.getClass().getCanonicalName(), "getRecordText #" + recordId + " returned in " + t1 + " ms");
+        Log.d(this.getClass().getSimpleName(), "getRecordText #" + recordId + " returned in " + t1 + " ms");
         return text;
     }
 
@@ -218,7 +216,7 @@ class DBHelper extends SQLiteOpenHelper {
                 out.add(readRecord(cursor, loadText, crypto));
             }
             t1 = System.currentTimeMillis() - t1;
-            Log.i(this.getClass().getCanonicalName(), "getAllRecordsNoTextByTimeDesc returned " + out.size() + " records in " + t1 + " ms");
+            Log.i(this.getClass().getSimpleName(), "getAllRecordsNoTextByTimeDesc returned " + out.size() + " records in " + t1 + " ms");
             return out;
         }
     }
@@ -238,7 +236,7 @@ class DBHelper extends SQLiteOpenHelper {
                 out.add(readRecord(cursor, true, crypto));
             }
             t1 = System.currentTimeMillis() - t1;
-            Log.i(this.getClass().getCanonicalName(), "getAllRecords returned " + out.size() + " records in " + t1 + " ms");
+            Log.i(this.getClass().getSimpleName(), "getAllRecords returned " + out.size() + " records in " + t1 + " ms");
             return out;
         }
     }
@@ -298,11 +296,11 @@ class DBHelper extends SQLiteOpenHelper {
             Log.i(this.getClass().getSimpleName(), "Deleted tag #" + tagId);
     }
 
-    void clearTags(long recordId) {
+    void clearTagsForRecord(long recordId) {
         String selection = RecordTagTable.COLUMN_RECORD_ID + " = ?";
         String[] selectionArgs = {String.valueOf(recordId)};
-        db.delete(RecordTagTable.TABLE_NAME, selection, selectionArgs);
-        Log.i(this.getClass().getSimpleName(), "Deleted all tags for record #" + recordId);
+        int tagsDeleted = db.delete(RecordTagTable.TABLE_NAME, selection, selectionArgs);
+        Log.i(this.getClass().getSimpleName(), "Deleted all " + tagsDeleted + " tags for record #" + recordId);
     }
 
     long getRecordsCount() {
@@ -331,7 +329,7 @@ class DBHelper extends SQLiteOpenHelper {
                 }
             }
         } catch (Exception e) {
-            Log.e(this.getClass().getCanonicalName(), "Can't check password", e);
+            Log.e(this.getClass().getSimpleName(), "Can't check password", e);
         }
 
         return false;
@@ -342,15 +340,15 @@ class DBHelper extends SQLiteOpenHelper {
             return;
 
         try {
-            Log.i(this.getClass().getCanonicalName(), "Deleting records with ecrypted text len < " + crypto.getMinLength());
+            Log.i(this.getClass().getSimpleName(), "Deleting records with ecrypted text len < " + crypto.getMinLength());
             for (long id : getZeroLengthRecordIds(crypto)) {
-                Log.i(this.getClass().getCanonicalName(), "Deleting empty record " + id);
+                Log.i(this.getClass().getSimpleName(), "Deleting empty record " + id);
                 deleteRecord(id);
-                clearTags(id);
+                clearTagsForRecord(id);
             }
 
         } catch (Exception e) {
-            Log.wtf(this.getClass().getCanonicalName(), e.toString(), e);
+            Log.wtf(this.getClass().getSimpleName(), e.toString(), e);
         }
     }
 
@@ -398,7 +396,7 @@ class DBHelper extends SQLiteOpenHelper {
                 tags.add(new Tag(tagId, tagName));
             }
             t1 = System.currentTimeMillis() - t1;
-            Log.i(this.getClass().getCanonicalName(), "getAllTags returned " + tags.size() + " tags in " + t1 + " ms");
+            Log.i(this.getClass().getSimpleName(), "getAllTags returned " + tags.size() + " tags in " + t1 + " ms");
             return tags;
         }
     }
@@ -446,7 +444,7 @@ class DBHelper extends SQLiteOpenHelper {
                 record = readRecord(cursor, true, crypto);
             }
         } catch (Exception e) {
-            Log.e(this.getClass().getCanonicalName(), "Can't get record #" + recordId, e);
+            Log.e(this.getClass().getSimpleName(), "Can't get record #" + recordId, e);
         }
         return record;
 

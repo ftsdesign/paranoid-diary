@@ -24,9 +24,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import java.security.GeneralSecurityException;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -100,7 +100,7 @@ public class WriteActivity extends AppCompatActivity implements ModifyTagsListen
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.i(this.getClass().getCanonicalName(), "onCreate");
+        Log.i(this.getClass().getSimpleName(), "onCreate");
         // To prevent the activity content to show up in the app thumbnail
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
         super.onCreate(savedInstanceState);
@@ -162,49 +162,52 @@ public class WriteActivity extends AppCompatActivity implements ModifyTagsListen
     @Override
     public void onBackPressed() {
         onFinishedWriting();
-        super.onBackPressed();
     }
 
+    /**
+     * Normally called on pressing back or write button, and also
+     * if the activity is getting stopped/destroyed for any other reasons,
+     * so that we'll never lose what's written.
+     */
     private void onFinishedWriting() {
         Log.i(this.getClass().getSimpleName(), "onFinishedWriting");
+        saveBeforeClose(record);
+        record = null;
         finish();
     }
 
     private synchronized void saveBeforeClose(final Record record) {
-        Log.i(this.getClass().getSimpleName(), "saveBeforeClose");
         if (record != null) {
+            Log.i(this.getClass().getSimpleName(), "saveBeforeClose " + record.getId());
             updateRecordFromUI(record);
+            addRecordTagsFromText(record);
             saveCurrentRecord(record);
-            saveAutoTagsFromText(record);
         }
         if (saveTextOnUpdateTimerTask != null) {
             saveTextOnUpdateTimerTask.cancel();
         }
     }
 
-    private void saveAutoTagsFromText(final Record record) {
-        if (record != null) {
-            try {
-                Collection<String> tagNames = DataUtils.extractTags(record.getText());
-                for (String tagName : tagNames) {
-                    Tag tag = dataStorageService.getOrCreateTagByName(tagName);
-                    record.getTags().add(tag);
-                    dataStorageService.updateTags(record);
-                }
-            } catch (Exception e) {
-                Util.toastException(this, e);
+    private void addRecordTagsFromText(@NonNull final Record record) {
+        try {
+            Set<String> tagNames = DataUtils.extractTags(record.getText());
+            for (String tagName : tagNames) {
+                Tag tag = dataStorageService.getOrCreateTagByName(tagName);
+                record.getTags().add(tag);
             }
+        } catch (Exception e) {
+            Util.toastException(this, e);
         }
     }
 
     private synchronized void saveCurrentRecord(final Record record) {
         if (dataStorageService != null && record != null) {
             try {
-                Log.i(WriteActivity.class.getCanonicalName(), "" + record.getText().length());
                 if (record.hasText()) {
-                    Log.i(this.getClass().getCanonicalName(), "saving text " + record.getText().length());
-                    dataStorageService.update(record);
+                    Log.i(this.getClass().getSimpleName(), "Saving text (" + record.getText().length() + ") for record #" + record.getId());
+                    dataStorageService.updateRecordAndTags(record);
                 } else {
+                    Log.i(WriteActivity.class.getSimpleName(), "Record #" + record.getId() + " has no text, deleting");
                     dataStorageService.delete(record.getId());
                 }
                 lastSaved = System.currentTimeMillis();
@@ -216,7 +219,7 @@ public class WriteActivity extends AppCompatActivity implements ModifyTagsListen
 
     @Override
     protected void onDestroy() {
-        Log.i(this.getClass().getCanonicalName(), "onDestroy");
+        Log.i(this.getClass().getSimpleName(), "onDestroy");
         saveBeforeClose(record);
         record = null;
         super.onDestroy();
@@ -224,7 +227,7 @@ public class WriteActivity extends AppCompatActivity implements ModifyTagsListen
 
     @Override
     protected void onStart() {
-        Log.i(this.getClass().getCanonicalName(), "onStart");
+        Log.i(this.getClass().getSimpleName(), "onStart");
         super.onStart();
         Intent intent = new Intent(this, DataStorageService.class);
         bindService(intent, connection, Context.BIND_AUTO_CREATE);
@@ -232,7 +235,7 @@ public class WriteActivity extends AppCompatActivity implements ModifyTagsListen
 
     @Override
     protected void onStop() {
-        Log.i(this.getClass().getCanonicalName(), "onStop");
+        Log.i(this.getClass().getSimpleName(), "onStop");
         saveBeforeClose(record); // Don't clear the record as we might restart
         super.onStop();
         unbindService(connection);

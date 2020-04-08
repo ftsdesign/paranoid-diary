@@ -12,7 +12,19 @@
         android:id="@+id/action_filter"
         android:orderInCategory="100"
         android:title="@string/action_filter"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="ifRoom" >
+        <menu>
+            <item
+                android:id="@+id/action_filter_tags"
+                android:icon="@drawable/ic_action_tag"
+                android:orderInCategory="100"
+                android:title=""/>
+            <item
+                android:id="@+id/action_clear_filter"
+                android:orderInCategory="100"
+                android:title="@string/action_clear_filter"/>
+        </menu>
+    </item>
     <item
         android:id="@+id/action_tag"
         android:orderInCategory="100"

@@ -94,6 +94,7 @@
     <string name="are_you_sure_delete_record">Are you sure you want to permanently delete record %s \"%s\"?</string>
     <string name="toast_records_deleted">Records deleted: %d</string>
     <string name="new_tag">New tag</string>
+    <string name="action_clear_filter">Clear filter</string>
 
     <string-array name="backup_formats_array">
         <item>Text</item>

@@ -18,6 +18,6 @@ public abstract class NamedPredicate<T> {
     @NonNull
     @Override
     public String toString() {
-        return "[" + getName() + "]";
+        return getName();
     }
 }

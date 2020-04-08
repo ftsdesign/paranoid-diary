@@ -109,7 +109,7 @@ class RecordsViewAdapter extends RecyclerView.Adapter<RecordsViewAdapter.RecordV
         return filteredRecords.size();
     }
 
-    public int getItemCountUnfiltered() {
+    int getItemCountUnfiltered() {
         return records.size();
     }
 
@@ -185,6 +185,11 @@ class RecordsViewAdapter extends RecyclerView.Adapter<RecordsViewAdapter.RecordV
         // TODO
         notifyDataSetChanged();
         mainActivity.onRecordFilterUpdated();
+    }
+
+    @Nullable
+    NamedPredicate<Record> getRecordPredicate() {
+        return recordPredicate;
     }
 
     void clearPredicate() {

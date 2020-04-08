@@ -312,20 +312,11 @@ public class MainActivity extends AppCompatActivity
                 return true;
 
             case R.id.action_tag:
-                if (selectionTracker.hasSelection()) {
-                    Map<Tag, MultiSelectionState> tagToSelectionState = getTagsSelectionState(getSelectedRecords());
-                    final List<Long> selectedRecordIds = getSelectedRecordIds();
-                    String header = getString(R.string.records_affected, selectedRecordIds.size());
-                    TagsDialogFragment dialog = new TagsDialogFragment(dataStorageService, tagToSelectionState, header);
-                    dialog.show(getSupportFragmentManager(), TAG_TAG_DIALOG_FRAGMENT);
-
-                } else {
-                    toastSelectSomething();
-                }
+                doTagRecords();
                 return true;
 
-            case R.id.action_filter:
-                doShowFilter();
+            case R.id.action_clear_filter:
+                doClearFilter();
                 return true;
 
             case R.id.action_share:
@@ -357,6 +348,18 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    private void doTagRecords() {
+        if (selectionTracker.hasSelection()) {
+            Map<Tag, MultiSelectionState> tagToSelectionState = getTagsSelectionState(getSelectedRecords());
+            final List<Long> selectedRecordIds = getSelectedRecordIds();
+            String header = getString(R.string.records_affected, selectedRecordIds.size());
+            TagsDialogFragment dialog = new TagsDialogFragment(dataStorageService, tagToSelectionState, header);
+            dialog.show(getSupportFragmentManager(), TAG_TAG_DIALOG_FRAGMENT);
+        } else {
+            toastSelectSomething();
+        }
+    }
+
     public void onRecordFilterUpdated() {
         invalidateOptionsMenu();
     }
@@ -380,6 +383,11 @@ public class MainActivity extends AppCompatActivity
         } else {
             actionFilterItem.setTitle(text);
         }
+
+        NamedPredicate<Record> predicate = recordsViewAdapter.getRecordPredicate();
+        final String predicateText = predicate != null ? predicate.toString() : "";
+        MenuItem tagFilterItem = menu.findItem(R.id.action_filter_tags);
+        tagFilterItem.setTitle(predicateText);
     }
 
     @Override
@@ -429,9 +437,7 @@ public class MainActivity extends AppCompatActivity
         return recordIds;
     }
 
-    private void doShowFilter() {
-        // TODO
-        Toast.makeText(this, "Clear filter", Toast.LENGTH_LONG).show();
+    private void doClearFilter() {
         recordsViewAdapter.clearPredicate();
     }
 

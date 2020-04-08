@@ -7,12 +7,12 @@ public class TagPredicate extends NamedPredicate<Record> {
     private final Tag tag;
 
     public TagPredicate(Tag tag) {
-        super("Has tag #" + tag.getName());
+        super("#" + tag.getName());
         this.tag = tag;
     }
 
     @Override
     public boolean test(Record record) {
-        return record.getTags() != null && record.getTags().contains(tag);
+        return record.getTags().contains(tag);
     }
 }

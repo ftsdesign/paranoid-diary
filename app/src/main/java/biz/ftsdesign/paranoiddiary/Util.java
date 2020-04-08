@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatDelegate;
 
 import com.google.android.flexbox.FlexboxLayout;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,10 +22,12 @@ import biz.ftsdesign.paranoiddiary.model.Record;
 import biz.ftsdesign.paranoiddiary.model.Tag;
 import biz.ftsdesign.paranoiddiary.predicate.TagPredicate;
 
-class Util {
-    static void toastException(@NonNull Activity activity, @NonNull Exception e) {
-        String message = e.getMessage() != null ? e.getMessage() : e.toString();
-        toastError(activity, message);
+public class Util {
+    static void toastException(@Nullable Activity activity, @NonNull Exception e) {
+        if (activity != null) {
+            String message = e.getMessage() != null ? e.getMessage() : e.toString();
+            toastError(activity, message);
+        }
     }
 
     static void toastError(@NonNull Activity activity, @NonNull String message) {
@@ -102,4 +105,17 @@ class Util {
         }
     }
 
+    public static String toString(@NonNull Tag tag) {
+        return "#" + tag.getName();
+    }
+
+    public static String toString(@NonNull Collection<Tag> tags) {
+        StringBuilder sb = new StringBuilder();
+        for (Tag tag : tags) {
+            if (sb.length() > 0)
+                sb.append(" ");
+            sb.append(toString(tag));
+        }
+        return sb.toString();
+    }
 }

@@ -1,7 +1,7 @@
 package biz.ftsdesign.paranoiddiary;
 
+import android.app.Activity;
 import android.app.Dialog;
-import android.content.Context;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -30,25 +30,30 @@ public class TagsDialogFragment extends DialogFragment {
     private final Map<Tag, MultiSelectionState> tagToSelectionState;
     private final String header;
     private final DataStorageService dataStorageService;
-    private ModifyTagsListener modifyTagsListener;
+    private final ModifyTagsListener modifyTagsListener;
+    private final Activity activity;
     private TagListAdapter tagListAdapter;
     private ListView listView;
     private Button buttonAddTag;
 
     TagsDialogFragment(@NonNull DataStorageService dataStorageService,
                        @NonNull Map<Tag, MultiSelectionState> tagToSelectionState,
-                       @Nullable String header) {
+                       @Nullable String header,
+                       @NonNull ModifyTagsListener modifyTagsListener,
+                       @NonNull Activity activity) {
         this.dataStorageService = dataStorageService;
         this.tagToSelectionState = tagToSelectionState;
         this.header = header;
+        this.modifyTagsListener = modifyTagsListener;
+        this.activity = activity;
     }
 
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        tagListAdapter = new TagListAdapter(getActivity(), dataStorageService);
+        tagListAdapter = new TagListAdapter(activity, dataStorageService);
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         builder.setTitle(R.string.set_tags);
         LayoutInflater inflater = requireActivity().getLayoutInflater();
 
@@ -99,22 +104,31 @@ public class TagsDialogFragment extends DialogFragment {
         }
 
         builder.setView(layout)
-                .setPositiveButton(R.string.done, (dialog, whichButton) -> {
-                    long[] checkedTagsArray = listView.getCheckedItemIds();
-                    List<Long> tagsToSetIds = new ArrayList<>(checkedTagsArray.length);
-                    for (long id : checkedTagsArray) {
-                        tagsToSetIds.add(id);
-                    }
-
-                    List<Long> tagsToUnsetIds = new LinkedList<>();
-                    for (Tag tag : dataStorageService.getAllTagsSortedByName()) {
-                        if (!tagsToSetIds.contains(tag.getId()))
-                            tagsToUnsetIds.add(tag.getId());
-                    }
-                    modifyTagsListener.modifyTags(tagsToSetIds, tagsToUnsetIds);
-                })
-                .setNegativeButton(R.string.cancel, (dialog, id) -> TagsDialogFragment.this.getDialog().cancel());
+                .setPositiveButton(R.string.done, (dialog, whichButton) -> onTagsSelectionDone())
+                .setNegativeButton(R.string.cancel, (dialog, id) -> onCancel());
         return builder.create();
+    }
+
+    private void onTagsSelectionDone() {
+        long[] checkedTagsArray = listView.getCheckedItemIds();
+        final List<Long> tagsToSetIds = new ArrayList<>(checkedTagsArray.length);
+        for (long id : checkedTagsArray) {
+            tagsToSetIds.add(id);
+        }
+
+        final List<Long> tagsToUnsetIds = new LinkedList<>();
+        for (Tag tag : dataStorageService.getAllTagsSortedByName()) {
+            if (!tagsToSetIds.contains(tag.getId()))
+                tagsToUnsetIds.add(tag.getId());
+        }
+        modifyTagsListener.onTagsSelectionChanged(tagsToSetIds, tagsToUnsetIds);
+    }
+
+    private void onCancel() {
+        Dialog dialog = TagsDialogFragment.this.getDialog();
+        if (dialog != null) {
+            dialog.cancel();
+        }
     }
 
     private void enableAddTagButton(boolean enabled) {
@@ -132,11 +146,5 @@ public class TagsDialogFragment extends DialogFragment {
         } catch (GeneralSecurityException e) {
             Util.toastException(getActivity(), e);
         }
-    }
-
-    @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-        modifyTagsListener = (ModifyTagsListener) context;
     }
 }

@@ -1,7 +1,9 @@
 package biz.ftsdesign.paranoiddiary;
 
+import androidx.annotation.NonNull;
+
 import java.util.List;
 
 interface ModifyTagsListener {
-    void modifyTags(List<Long> tagsToSetIds, List<Long> tagsToUnsetIds);
+    void onTagsSelectionChanged(@NonNull List<Long> tagsToSetIds, @NonNull List<Long> tagsToUnsetIds);
 }

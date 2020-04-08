@@ -89,7 +89,8 @@ public class WriteActivity extends AppCompatActivity implements ModifyTagsListen
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_tag:
-                TagsDialogFragment dialog = new TagsDialogFragment(dataStorageService, Util.getTagSelectionState(record), null);
+                TagsDialogFragment dialog = new TagsDialogFragment(dataStorageService,
+                        Util.getTagSelectionState(record), null, this, this);
                 dialog.show(getSupportFragmentManager(), TAG_TAG_DIALOG_FRAGMENT);
                 return true;
 
@@ -253,7 +254,7 @@ public class WriteActivity extends AppCompatActivity implements ModifyTagsListen
     }
 
     @Override
-    public void modifyTags(List<Long> tagsToSetIds, List<Long> tagsToUnsetIds) {
+    public void onTagsSelectionChanged(@NonNull List<Long> tagsToSetIds, @NonNull List<Long> tagsToUnsetIds) {
         for (long tagToSet : tagsToSetIds) {
             Tag tag = dataStorageService.getTag(tagToSet);
             record.getTags().add(tag);

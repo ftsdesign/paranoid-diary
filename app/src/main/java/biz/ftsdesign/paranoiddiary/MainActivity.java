@@ -51,9 +51,10 @@ import biz.ftsdesign.paranoiddiary.model.GeoTag;
 import biz.ftsdesign.paranoiddiary.model.Record;
 import biz.ftsdesign.paranoiddiary.model.Tag;
 import biz.ftsdesign.paranoiddiary.predicate.NamedPredicate;
+import biz.ftsdesign.paranoiddiary.predicate.TagPredicate;
 
 public class MainActivity extends AppCompatActivity
-        implements PasswordListener, RecordPredicateListener, ModifyTagsListener, InitDialogFragment.InitDialogListener {
+        implements PasswordListener, RecordPredicateListener, InitDialogFragment.InitDialogListener {
     public static final String KEY_RECORD_ID = "record.id";
     private static final String TAG_INIT_DIALOG_FRAGMENT = "InitDialogFragment";
     private static final String TAG_TAG_DIALOG_FRAGMENT = "TagDialogFragment";
@@ -319,6 +320,10 @@ public class MainActivity extends AppCompatActivity
                 doClearFilter();
                 return true;
 
+            case R.id.action_filter_tags:
+                doSetFilterTags();
+                return true;
+
             case R.id.action_share:
                 if (selectionTracker.hasSelection()) {
                     doShare();
@@ -348,12 +353,37 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    private void doSetFilterTags() {
+        TagsDialogFragment dialog = new TagsDialogFragment(dataStorageService, new HashMap<>(), "Set filter tag",
+                new ModifyTagsListener() {
+                    @Override
+                    public void onTagsSelectionChanged(@NonNull List<Long> tagsToSetIds, @NonNull List<Long> tagsToUnsetIds) {
+                        List<Tag> tags = dataStorageService.getTags(tagsToSetIds);
+                        if (tags.isEmpty()) {
+                            recordsViewAdapter.clearPredicate();
+                        } else {
+                            recordsViewAdapter.setPredicate(new TagPredicate(tags));
+                        }
+                    }
+        }, this);
+        dialog.show(getSupportFragmentManager(), TAG_TAG_DIALOG_FRAGMENT);
+    }
+
     private void doTagRecords() {
         if (selectionTracker.hasSelection()) {
             Map<Tag, MultiSelectionState> tagToSelectionState = getTagsSelectionState(getSelectedRecords());
             final List<Long> selectedRecordIds = getSelectedRecordIds();
             String header = getString(R.string.records_affected, selectedRecordIds.size());
-            TagsDialogFragment dialog = new TagsDialogFragment(dataStorageService, tagToSelectionState, header);
+            TagsDialogFragment dialog = new TagsDialogFragment(dataStorageService, tagToSelectionState, header,
+                    new ModifyTagsListener() {
+                        @Override
+                        public void onTagsSelectionChanged(@NonNull List<Long> tagsToSetIds, @NonNull List<Long> tagsToUnsetIds) {
+                            final List<Long> selectedRecordIds = getSelectedRecordIds();
+                            Log.i(this.getClass().getSimpleName(), "For " + selectedRecordIds.size() + " selected records, set " + tagsToSetIds.size() + ", unset " + tagsToUnsetIds.size() + " tags");
+                            dataStorageService.bulkModifyTags(selectedRecordIds, tagsToSetIds, tagsToUnsetIds);
+                            recordsViewAdapter.updateRecords(selectedRecordIds);
+                        }
+                    }, this);
             dialog.show(getSupportFragmentManager(), TAG_TAG_DIALOG_FRAGMENT);
         } else {
             toastSelectSomething();
@@ -388,15 +418,6 @@ public class MainActivity extends AppCompatActivity
         final String predicateText = predicate != null ? predicate.toString() : "";
         MenuItem tagFilterItem = menu.findItem(R.id.action_filter_tags);
         tagFilterItem.setTitle(predicateText);
-    }
-
-    @Override
-    public void modifyTags(List<Long> tagsToSetIds, List<Long> tagsToUnsetIds) {
-        final List<Long> selectedRecordIds = getSelectedRecordIds();
-        Log.i(this.getClass().getSimpleName(), "For " + selectedRecordIds.size() + " selected records, set " + tagsToSetIds.size() + ", unset " + tagsToUnsetIds.size() + " tags");
-        dataStorageService.bulkModifyTags(selectedRecordIds, tagsToSetIds, tagsToUnsetIds);
-        recordsViewAdapter.updateRecords(selectedRecordIds);
-
     }
 
     @NonNull

@@ -1,6 +1,7 @@
 package biz.ftsdesign.paranoiddiary.predicate;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 public abstract class NamedPredicate<T> {
     protected final String name;
@@ -9,8 +10,9 @@ public abstract class NamedPredicate<T> {
         this.name = name;
     }
 
-    public abstract boolean test(T t);
+    public abstract boolean test(@Nullable T t);
 
+    @NonNull
     public String getName() {
         return name;
     }

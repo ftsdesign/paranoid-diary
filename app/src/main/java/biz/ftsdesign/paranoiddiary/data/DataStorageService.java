@@ -11,8 +11,10 @@ import androidx.annotation.Nullable;
 
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
@@ -230,6 +232,8 @@ public class DataStorageService extends Service implements PasswordListener {
         Log.i(this.getClass().getSimpleName(), "Performing global password change");
         try {
             final CryptoModule newCryptoModule = getCryptoModule(newPassword.toCharArray());
+            if (newCryptoModule == null)
+                throw new GeneralSecurityException("Password is not set");
 
             dbHelper.savePwdCheck(newCryptoModule);
             List<Record> allRecords = dbHelper.getAllRecords(crypto);
@@ -290,6 +294,19 @@ public class DataStorageService extends Service implements PasswordListener {
     @Nullable
     public synchronized Tag getTag(long tagId) {
         return idToTag.get(tagId);
+    }
+
+    @NonNull
+    public synchronized List<Tag> getTags(@NonNull Collection<Long> tagIds) {
+        final List<Tag> out = new LinkedList<>();
+        for (long tagId : tagIds) {
+            Tag tag = idToTag.get(tagId);
+            if (tag != null) {
+                out.add(tag);
+            }
+        }
+        Collections.sort(out);
+        return out;
     }
 
     public void savePwdCheck() {

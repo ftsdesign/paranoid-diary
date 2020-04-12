@@ -30,6 +30,7 @@ import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -152,8 +153,9 @@ public class MainActivity extends AppCompatActivity
         if (!TransientPasswordStorage.isSet()) {
             final EditText input = new EditText(this);
             input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+            input.requestFocus();
 
-            new AlertDialog.Builder(this)
+            AlertDialog passwordDialog = new AlertDialog.Builder(this)
                     .setTitle(getString(R.string.enter_password))
                     .setIcon(R.drawable.ic_action_lock)
                     .setView(input)
@@ -169,7 +171,12 @@ public class MainActivity extends AppCompatActivity
                             }
                         }
                     })
-                    .setNegativeButton(android.R.string.no, null).show();
+                    .setNegativeButton(android.R.string.no, null).create();
+            Window window = passwordDialog.getWindow();
+            if (window != null) {
+                window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+            }
+            passwordDialog.show();
         }
     }
 

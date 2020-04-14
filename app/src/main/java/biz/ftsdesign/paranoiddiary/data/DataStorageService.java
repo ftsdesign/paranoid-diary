@@ -47,7 +47,7 @@ public class DataStorageService extends Service implements PasswordListener {
 
     @Nullable
     public synchronized Record getRecord(long recordId) {
-        if (!TransientPasswordStorage.isSet())
+        if (crypto == null)
             return null;
         Log.i(this.getClass().getSimpleName(), "getRecord " + recordId);
         final Record record = dbHelper.getRecord(recordId, crypto);
@@ -60,7 +60,7 @@ public class DataStorageService extends Service implements PasswordListener {
     }
 
     public synchronized void updateRecordAndTags(@NonNull Record record) throws GeneralSecurityException {
-        if (!TransientPasswordStorage.isSet())
+        if (crypto == null)
             return;
         Log.i(this.getClass().getSimpleName(), "update " + record);
         record.setTimeUpdated(System.currentTimeMillis());
@@ -69,7 +69,7 @@ public class DataStorageService extends Service implements PasswordListener {
     }
 
     public synchronized Record createNewRecord(@NonNull Record record) throws GeneralSecurityException {
-        if (!TransientPasswordStorage.isSet())
+        if (crypto == null)
             return null;
         record.setTimeCreated(System.currentTimeMillis());
         record.setTimeUpdated(record.getTimeCreated());
@@ -82,7 +82,7 @@ public class DataStorageService extends Service implements PasswordListener {
 
     @NonNull
     public synchronized List<Record> getAllRecordsNoText(final int diaryId) throws GeneralSecurityException {
-        if (!TransientPasswordStorage.isSet())
+        if (crypto == null)
             return Collections.emptyList();
         final List<Record> records = dbHelper.getAllRecordsNoTextByTimeDesc(diaryId);
         populateRecordsWithTags(records);
@@ -123,15 +123,15 @@ public class DataStorageService extends Service implements PasswordListener {
 
     @NonNull
     public synchronized List<Record> getAllRecords(final int diaryId) throws GeneralSecurityException {
-        if (!TransientPasswordStorage.isSet())
+        if (crypto == null)
             return Collections.emptyList();
         final List<Record> records = dbHelper.getAllRecordsByTimeDesc(diaryId, crypto);
         populateRecordsWithTags(records);
         return records;
     }
 
-    public synchronized void delete(long recordId) {
-        if (!TransientPasswordStorage.isSet())
+    public synchronized void deleteRecordAndTagMappings(long recordId) {
+        if (crypto == null)
             return;
         Log.i(this.getClass().getCanonicalName(), "delete " + recordId);
         dbHelper.deleteRecord(recordId);
@@ -222,7 +222,7 @@ public class DataStorageService extends Service implements PasswordListener {
 
     public synchronized void deleteRecords(@NonNull List<Record> recordsToDelete) {
         for (Record record : recordsToDelete) {
-            delete(record.getId());
+            deleteRecordAndTagMappings(record.getId());
         }
     }
 

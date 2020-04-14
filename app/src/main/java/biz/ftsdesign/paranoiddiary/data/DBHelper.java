@@ -116,12 +116,14 @@ class DBHelper extends SQLiteOpenHelper {
         values.put(RecordTable.COLUMN_TIME_UPDATED, record.getTimeUpdated());
         if (record.hasText()) {
             values.put(RecordTable.COLUMN_ENCRYPTED_TEXT, crypto.encrypt(record.getText()));
+        } else {
+            values.put(RecordTable.COLUMN_ENCRYPTED_TEXT, (byte[])null);
         }
 
         String[] whereArgs = {String.valueOf(record.getId())};
         int rowsUpdated = db.update(RecordTable.TABLE_NAME, values,  RecordTable._ID + " = ?", whereArgs);
         if (rowsUpdated != 1)
-            Log.wtf(this.getClass().getSimpleName(), "Rows updated: " + rowsUpdated);
+            Log.wtf(this.getClass().getSimpleName(), "Can't update record #" + record.getId() + ": rows updated: " + rowsUpdated);
     }
 
     void updateTagName(@NonNull final Tag tag, @NonNull final CryptoModule crypto) throws GeneralSecurityException {
@@ -131,7 +133,7 @@ class DBHelper extends SQLiteOpenHelper {
         String[] whereArgs = {String.valueOf(tag.getId())};
         int rowsUpdated = db.update(TagTable.TABLE_NAME, values,  TagTable._ID + " = ?", whereArgs);
         if (rowsUpdated != 1)
-            Log.wtf(this.getClass().getSimpleName(), "Rows updated: " + rowsUpdated);
+            Log.wtf(this.getClass().getSimpleName(), "Can't update tag name #" + tag.getId() + ": rows updated: " + rowsUpdated);
     }
 
     private void setTagForRecord(@NonNull Record record, @NonNull Tag tag) {
@@ -281,7 +283,7 @@ class DBHelper extends SQLiteOpenHelper {
         String[] selectionArgs = {String.valueOf(recordId)};
         int deletedRows = db.delete(RecordTable.TABLE_NAME, selection, selectionArgs);
         if (deletedRows != 1)
-            Log.wtf(this.getClass().getSimpleName(), "deletedRows = " + deletedRows);
+            Log.wtf(this.getClass().getSimpleName(), "Can't delete record #" + recordId + ": rows deleted: " + deletedRows);
         else
             Log.i(this.getClass().getSimpleName(), "Deleted record #" + recordId);
     }
@@ -291,7 +293,7 @@ class DBHelper extends SQLiteOpenHelper {
         String[] selectionArgs = {String.valueOf(tagId)};
         int deletedRows = db.delete(TagTable.TABLE_NAME, selection, selectionArgs);
         if (deletedRows != 1)
-            Log.wtf(this.getClass().getSimpleName(), "deletedRows = " + deletedRows);
+            Log.wtf(this.getClass().getSimpleName(), "Can't delete tag #" + tagId + ": rows deleted: " + deletedRows);
         else
             Log.i(this.getClass().getSimpleName(), "Deleted tag #" + tagId);
     }
@@ -301,10 +303,6 @@ class DBHelper extends SQLiteOpenHelper {
         String[] selectionArgs = {String.valueOf(recordId)};
         int tagsDeleted = db.delete(RecordTagTable.TABLE_NAME, selection, selectionArgs);
         Log.i(this.getClass().getSimpleName(), "Deleted all " + tagsDeleted + " tags for record #" + recordId);
-    }
-
-    long getRecordsCount() {
-        return DatabaseUtils.queryNumEntries(db, RecordTable.TABLE_NAME);
     }
 
     boolean isPasswordCorrect(@NonNull final CryptoModule crypto) {

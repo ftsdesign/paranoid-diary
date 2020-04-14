@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.preference.PreferenceManager;
@@ -36,6 +37,7 @@ public final class GeoUtils {
                 ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
 
+    @Nullable
     public static GeoTag getGeoTag(@NonNull Activity activity) {
         Log.i(GeoUtils.class.getSimpleName(), "getGeoTag");
         GeoTag geoTag = null;

@@ -1,6 +1,7 @@
 package biz.ftsdesign.paranoiddiary.model;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import java.util.Date;
 import java.util.Objects;
@@ -63,7 +64,7 @@ public class Record {
         return text;
     }
 
-    public void setText(String text) {
+    public void setText(@NonNull String text) {
         this.text = text;
     }
 
@@ -72,11 +73,12 @@ public class Record {
         return tags;
     }
 
+    @Nullable
     public GeoTag getGeoTag() {
         return geoTag;
     }
 
-    public void setGeoTag(GeoTag geoTag) {
+    public void setGeoTag(@Nullable GeoTag geoTag) {
         this.geoTag = geoTag;
     }
 

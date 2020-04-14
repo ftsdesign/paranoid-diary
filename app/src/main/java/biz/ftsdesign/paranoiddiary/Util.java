@@ -23,6 +23,14 @@ import biz.ftsdesign.paranoiddiary.model.Tag;
 import biz.ftsdesign.paranoiddiary.predicate.TagPredicate;
 
 public class Util {
+    @SuppressWarnings("SameParameterValue")
+    static void toastShort(@Nullable Activity activity, @NonNull String message) {
+        if (activity != null) {
+            Toast toast = Toast.makeText(activity.getApplicationContext(), message, Toast.LENGTH_SHORT);
+            toast.show();
+        }
+    }
+
     static void toastException(@Nullable Activity activity, @NonNull Exception e) {
         if (activity != null) {
             String message = e.getMessage() != null ? e.getMessage() : e.toString();
@@ -96,6 +104,7 @@ public class Util {
         return RecordHeaderFormat.FORMAT_DEFAULT.format(record);
     }
 
+    @SuppressWarnings("SameParameterValue")
     @NonNull
     static String cutString(@NonNull String text, int numberOfCharacters) {
         if (text.length() <= numberOfCharacters) {

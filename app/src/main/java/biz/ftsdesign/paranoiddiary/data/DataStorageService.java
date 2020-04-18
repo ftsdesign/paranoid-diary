@@ -23,6 +23,11 @@ import java.util.TreeMap;
 import biz.ftsdesign.paranoiddiary.model.Record;
 import biz.ftsdesign.paranoiddiary.model.Tag;
 
+/**
+ * If the password is not set (crypto == null):
+ * - For read operations, we return null or empty collections
+ * - For write operations, we throw GeneralSecurityException
+ */
 public class DataStorageService extends Service implements PasswordListener {
     private final IBinder binder;
     private CryptoModule crypto;
@@ -61,19 +66,20 @@ public class DataStorageService extends Service implements PasswordListener {
 
     public synchronized void updateRecordAndTags(@NonNull Record record) throws GeneralSecurityException {
         if (crypto == null)
-            return;
+            throw new GeneralSecurityException("No password");
         Log.i(this.getClass().getSimpleName(), "update " + record);
         record.setTimeUpdated(System.currentTimeMillis());
         dbHelper.updateTextAndTimestamp(record, crypto);
         dbHelper.updateRecordTagMappings(record);
     }
 
+    @NonNull
     public synchronized Record createNewRecord(@NonNull Record record) throws GeneralSecurityException {
         if (crypto == null)
-            return null;
+            throw new GeneralSecurityException("No password");
         record.setTimeCreated(System.currentTimeMillis());
         record.setTimeUpdated(record.getTimeCreated());
-        Record out = dbHelper.create(record, crypto);
+        final Record out = dbHelper.create(record, crypto);
         dbHelper.updateRecordTagMappings(record);
         reloadRecordTagMappings();
         Log.i(this.getClass().getCanonicalName(), "createNewRecord completed " + out);
@@ -130,9 +136,9 @@ public class DataStorageService extends Service implements PasswordListener {
         return records;
     }
 
-    public synchronized void deleteRecordAndTagMappings(long recordId) {
+    public synchronized void deleteRecordAndTagMappings(long recordId) throws GeneralSecurityException {
         if (crypto == null)
-            return;
+            throw new GeneralSecurityException("No password");
         Log.i(this.getClass().getCanonicalName(), "delete " + recordId);
         dbHelper.deleteRecord(recordId);
         dbHelper.clearTagsForRecord(recordId);
@@ -186,7 +192,7 @@ public class DataStorageService extends Service implements PasswordListener {
     }
 
     @Override
-    public void onAfterPasswordCleared() {
+    public synchronized void onAfterPasswordCleared() {
         crypto = null;
         clearTags();
     }
@@ -199,7 +205,7 @@ public class DataStorageService extends Service implements PasswordListener {
     }
 
     @Override
-    public void onPasswordSet() {
+    public synchronized void onPasswordSet() {
         crypto = getCryptoModule(TransientPasswordStorage.getPassword());
         ensureAllTagsLoaded();
     }
@@ -220,7 +226,7 @@ public class DataStorageService extends Service implements PasswordListener {
         return out;
     }
 
-    public synchronized void deleteRecords(@NonNull List<Record> recordsToDelete) {
+    public synchronized void deleteRecords(@NonNull List<Record> recordsToDelete) throws GeneralSecurityException {
         for (Record record : recordsToDelete) {
             deleteRecordAndTagMappings(record.getId());
         }
@@ -278,7 +284,10 @@ public class DataStorageService extends Service implements PasswordListener {
         return tagIdToCount;
     }
 
-    public synchronized void bulkModifyTags(@NonNull List<Long> recordIds, @NonNull List<Long> tagsToSetIds, @NonNull List<Long> tagsToUnsetIds) {
+    public synchronized void bulkModifyTags(@NonNull List<Long> recordIds, @NonNull List<Long> tagsToSetIds,
+                                            @NonNull List<Long> tagsToUnsetIds) throws GeneralSecurityException {
+        if (crypto == null)
+            throw new GeneralSecurityException("No password");
         Log.i(this.getClass().getSimpleName(), "Bulk set " + tagsToSetIds.size() + " unset " + tagsToUnsetIds.size() + " tags for " + recordIds.size() + " records");
         for (long recordId : recordIds) {
             for (long tagId : tagsToSetIds) {
@@ -358,7 +367,7 @@ public class DataStorageService extends Service implements PasswordListener {
     }
 
     @NonNull
-    public synchronized Tag getOrCreateTagByName(String tagString) throws GeneralSecurityException {
+    public synchronized Tag getOrCreateTagByName(@NonNull String tagString) throws GeneralSecurityException {
         ensureAllTagsLoaded();
         Tag tag = tagStringToTag.get(tagString);
         if (tag == null) {

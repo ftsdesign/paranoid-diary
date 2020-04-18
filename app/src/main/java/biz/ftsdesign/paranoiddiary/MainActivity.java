@@ -54,6 +54,8 @@ import biz.ftsdesign.paranoiddiary.model.Tag;
 import biz.ftsdesign.paranoiddiary.predicate.NamedPredicate;
 import biz.ftsdesign.paranoiddiary.predicate.TagPredicate;
 
+import static biz.ftsdesign.paranoiddiary.Formats.TIMESTAMP_FORMAT;
+
 public class MainActivity extends AppCompatActivity
         implements PasswordListener, RecordPredicateListener, InitDialogFragment.InitDialogListener {
     public static final String KEY_RECORD_ID = "record.id";
@@ -254,12 +256,27 @@ public class MainActivity extends AppCompatActivity
         });
 
         RecyclerView recyclerView = findViewById(R.id.recyclerViewRecords);
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recordsViewAdapter = new RecordsViewAdapter(this, Collections.emptyList());
         recordsViewAdapter.setTagColor(getResources().getColor(R.color.tag));
         recyclerView.setAdapter(recordsViewAdapter);
+//        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+//            @Override
+//            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+//                String s = "null";
+//                int topItemPosition = layoutManager.findFirstCompletelyVisibleItemPosition();
+//                if (topItemPosition >= 0) {
+//                    Record r = recordsViewAdapter.getRecordById(recordsViewAdapter.getItemId(topItemPosition));
+//                    if (r != null) {
+//                        s = Formats.format(TIMESTAMP_FORMAT, r.getTimeCreated());
+//                    }
+//                }
+//                Log.i(MainActivity.this.getClass().getSimpleName(), "===== scroll =====" + s);
+//                super.onScrolled(recyclerView, dx, dy);
+//            }
+//        });
 
         /*
         We only allow single selection here. Reasons:
@@ -362,17 +379,14 @@ public class MainActivity extends AppCompatActivity
 
     private void doSetFilterTags() {
         TagsDialogFragment dialog = new TagsDialogFragment(dataStorageService, new HashMap<>(), "Set filter tag",
-                new ModifyTagsListener() {
-                    @Override
-                    public void onTagsSelectionChanged(@NonNull List<Long> tagsToSetIds, @NonNull List<Long> tagsToUnsetIds) {
-                        List<Tag> tags = dataStorageService.getTags(tagsToSetIds);
-                        if (tags.isEmpty()) {
-                            recordsViewAdapter.clearPredicate();
-                        } else {
-                            recordsViewAdapter.setPredicate(new TagPredicate(tags));
-                        }
+                (tagsToSetIds, tagsToUnsetIds) -> {
+                    List<Tag> tags = dataStorageService.getTags(tagsToSetIds);
+                    if (tags.isEmpty()) {
+                        recordsViewAdapter.clearPredicate();
+                    } else {
+                        recordsViewAdapter.setPredicate(new TagPredicate(tags));
                     }
-        }, this);
+                }, this);
         dialog.show(getSupportFragmentManager(), TAG_TAG_DIALOG_FRAGMENT);
     }
 
@@ -385,10 +399,14 @@ public class MainActivity extends AppCompatActivity
                     new ModifyTagsListener() {
                         @Override
                         public void onTagsSelectionChanged(@NonNull List<Long> tagsToSetIds, @NonNull List<Long> tagsToUnsetIds) {
-                            final List<Long> selectedRecordIds = getSelectedRecordIds();
-                            Log.i(this.getClass().getSimpleName(), "For " + selectedRecordIds.size() + " selected records, set " + tagsToSetIds.size() + ", unset " + tagsToUnsetIds.size() + " tags");
-                            dataStorageService.bulkModifyTags(selectedRecordIds, tagsToSetIds, tagsToUnsetIds);
-                            recordsViewAdapter.updateRecords(selectedRecordIds);
+                            try {
+                                final List<Long> selectedRecordIds = getSelectedRecordIds();
+                                Log.i(this.getClass().getSimpleName(), "For " + selectedRecordIds.size() + " selected records, set " + tagsToSetIds.size() + ", unset " + tagsToUnsetIds.size() + " tags");
+                                dataStorageService.bulkModifyTags(selectedRecordIds, tagsToSetIds, tagsToUnsetIds);
+                                recordsViewAdapter.updateRecords(selectedRecordIds);
+                            } catch (GeneralSecurityException e) {
+                                Util.toastException(MainActivity.this, e);
+                            }
                         }
                     }, this);
             dialog.show(getSupportFragmentManager(), TAG_TAG_DIALOG_FRAGMENT);
@@ -534,11 +552,15 @@ public class MainActivity extends AppCompatActivity
                     .setIcon(R.drawable.ic_action_warning)
                     .setMessage(message)
                     .setPositiveButton(android.R.string.yes, (dialog, whichButton) -> {
-                        dataStorageService.deleteRecords(recordsToDelete);
-                        recordsViewAdapter.deleteRecords(recordsToDelete);
-                        selectionTracker.clearSelection();
-                        onRecordFilterUpdated();
-                        Toast.makeText(MainActivity.this, getString(R.string.toast_records_deleted, recordsToDelete.size()), Toast.LENGTH_LONG).show();
+                        try {
+                            dataStorageService.deleteRecords(recordsToDelete);
+                            recordsViewAdapter.deleteRecords(recordsToDelete);
+                            selectionTracker.clearSelection();
+                            onRecordFilterUpdated();
+                            Toast.makeText(MainActivity.this, getString(R.string.toast_records_deleted, recordsToDelete.size()), Toast.LENGTH_LONG).show();
+                        } catch (GeneralSecurityException e) {
+                            Util.toastException(MainActivity.this, e);
+                        }
                     })
                     .setNegativeButton(android.R.string.no, null).show();
         }

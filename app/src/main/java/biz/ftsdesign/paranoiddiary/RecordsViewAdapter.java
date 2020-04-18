@@ -1,5 +1,6 @@
 package biz.ftsdesign.paranoiddiary;
 
+import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -83,7 +84,7 @@ class RecordsViewAdapter extends RecyclerView.Adapter<RecordsViewAdapter.RecordV
             holder.headerView.setText(Util.composeRecordHeader(record));
 
             if (record.getGeoTag() != null) {
-                String geoTagText = String.format("%f %f", record.getGeoTag().getLat(), record.getGeoTag().getLon());
+                @SuppressLint("DefaultLocale") String geoTagText = String.format("%f %f", record.getGeoTag().getLat(), record.getGeoTag().getLon());
                 holder.geoTagView.setText(geoTagText);
                 holder.geoTagView.setVisibility(View.VISIBLE);
             } else {
@@ -228,7 +229,7 @@ class RecordsViewAdapter extends RecyclerView.Adapter<RecordsViewAdapter.RecordV
         this.notifyItemChanged(0);
     }
 
-    final class RecordViewHolder extends RecyclerView.ViewHolder {
+    static final class RecordViewHolder extends RecyclerView.ViewHolder {
         final TextView headerView;
         final TextView geoTagView;
         final TextView bodyView;

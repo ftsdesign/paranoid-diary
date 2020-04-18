@@ -17,6 +17,8 @@ import biz.ftsdesign.paranoiddiary.Formats;
 import biz.ftsdesign.paranoiddiary.model.Record;
 import biz.ftsdesign.paranoiddiary.model.Tag;
 
+import static biz.ftsdesign.paranoiddiary.Formats.TIMESTAMP_FORMAT;
+
 public class DataUtils {
     public static final String MIME_ZIP = "application/zip";
     public static final int DEFAULT_DIARY_ID = 1;
@@ -63,7 +65,7 @@ public class DataUtils {
     public static String toString(Record record) {
         StringBuilder sb = new StringBuilder();
         sb.append("#").append(record.getId()).append("\n");
-        sb.append(Formats.TIMESTAMP_FORMAT.format(new Date(record.getTimeCreated()))).append("\n");
+        sb.append(Formats.format(TIMESTAMP_FORMAT, record.getTimeCreated())).append("\n");
         if (record.getGeoTag() != null) {
             sb.append(record.getGeoTag().getLat()).append(",").append(record.getGeoTag().getLon()).append("\n");
         }

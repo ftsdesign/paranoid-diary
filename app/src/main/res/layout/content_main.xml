@@ -8,11 +8,20 @@
     tools:context=".MainActivity"
     tools:showIn="@layout/activity_main">
 
+    <!--
+    Fast scroll implementation in RecyclerView has a known problem with thumb size
+    https://issuetracker.google.com/issues/64729576
+    -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewRecords"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:padding="8dp"
+        app:fastScrollEnabled="true"
+        app:fastScrollHorizontalThumbDrawable="@drawable/thumb_drawable"
+        app:fastScrollHorizontalTrackDrawable="@drawable/line_drawable"
+        app:fastScrollVerticalThumbDrawable="@drawable/thumb_drawable"
+        app:fastScrollVerticalTrackDrawable="@drawable/line_drawable"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

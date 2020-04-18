@@ -13,7 +13,7 @@ public abstract class Formats {
     @SuppressLint("SimpleDateFormat")
     static final SimpleDateFormat FILE_TIMESTAMP_FORMAT = new SimpleDateFormat("yyyyMMdd_HHmm");
     @SuppressLint("SimpleDateFormat")
-    static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd-MMM-yyyy");
+    static final SimpleDateFormat MONTH_FORMAT = new SimpleDateFormat("MMMM yyyy");
 
     private Formats() {
         throw new UnsupportedOperationException();

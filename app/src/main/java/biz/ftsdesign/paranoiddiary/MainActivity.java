@@ -30,9 +30,11 @@ import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.security.GeneralSecurityException;
@@ -54,7 +56,7 @@ import biz.ftsdesign.paranoiddiary.model.Tag;
 import biz.ftsdesign.paranoiddiary.predicate.NamedPredicate;
 import biz.ftsdesign.paranoiddiary.predicate.TagPredicate;
 
-import static biz.ftsdesign.paranoiddiary.Formats.TIMESTAMP_FORMAT;
+import static android.view.View.INVISIBLE;
 
 public class MainActivity extends AppCompatActivity
         implements PasswordListener, RecordPredicateListener, InitDialogFragment.InitDialogListener {
@@ -99,6 +101,21 @@ public class MainActivity extends AppCompatActivity
             dataStorageService = null;
         }
     };
+
+    void setScrollBubble(boolean visible, String text) {
+        runOnUiThread(() -> {
+            TextView scrollBubbleView = findViewById(R.id.textViewSection);
+            if (scrollBubbleView != null) {
+                if (visible) {
+                    scrollBubbleView.setVisibility(View.VISIBLE);
+                    scrollBubbleView.setText(text);
+                } else {
+                    scrollBubbleView.setText("");
+                    scrollBubbleView.setVisibility(INVISIBLE);
+                }
+            }
+        });
+    }
 
     @Override
     public void onAfterPasswordCleared() {
@@ -262,21 +279,9 @@ public class MainActivity extends AppCompatActivity
         recordsViewAdapter = new RecordsViewAdapter(this, Collections.emptyList());
         recordsViewAdapter.setTagColor(getResources().getColor(R.color.tag));
         recyclerView.setAdapter(recordsViewAdapter);
-//        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-//            @Override
-//            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-//                String s = "null";
-//                int topItemPosition = layoutManager.findFirstCompletelyVisibleItemPosition();
-//                if (topItemPosition >= 0) {
-//                    Record r = recordsViewAdapter.getRecordById(recordsViewAdapter.getItemId(topItemPosition));
-//                    if (r != null) {
-//                        s = Formats.format(TIMESTAMP_FORMAT, r.getTimeCreated());
-//                    }
-//                }
-//                Log.i(MainActivity.this.getClass().getSimpleName(), "===== scroll =====" + s);
-//                super.onScrolled(recyclerView, dx, dy);
-//            }
-//        });
+
+        TextView textViewSection = MainActivity.this.findViewById(R.id.textViewSection);
+        recyclerView.addOnScrollListener(new ScrollBubbleHandler(layoutManager, textViewSection, recordsViewAdapter, this));
 
         /*
         We only allow single selection here. Reasons:

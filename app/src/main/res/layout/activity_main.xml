@@ -30,4 +30,16 @@
         android:layout_margin="@dimen/fab_margin"
         app:srcCompat="@drawable/ic_action_add_record" />
 
+    <TextView
+        android:id="@+id/textViewSection"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        android:text=""
+        android:background="@color/colorPrimaryDark"
+        android:textSize="32sp"
+        android:layout_margin="16dp"
+        android:layout_gravity="bottom|start"
+        />
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

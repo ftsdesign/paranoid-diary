@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.SectionIndexer;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -32,8 +33,11 @@ import biz.ftsdesign.paranoiddiary.predicate.NamedPredicate;
 
 import static biz.ftsdesign.paranoiddiary.data.DataUtils.PATTERN_HASHTAG;
 
-class RecordsViewAdapter extends RecyclerView.Adapter<RecordsViewAdapter.RecordViewHolder> {
+// TODO ExpandableListAdapter
+// FIXME SectionIndexer doesn't work with fast scroll as of April 2020
+class RecordsViewAdapter extends RecyclerView.Adapter<RecordsViewAdapter.RecordViewHolder> implements SectionIndexer {
     private final MainActivity mainActivity;
+    private final RecordSectionIndexer recordsSectionIndexer;
 
     private List<Record> records;
     private List<Record> filteredRecords;
@@ -44,12 +48,13 @@ class RecordsViewAdapter extends RecyclerView.Adapter<RecordsViewAdapter.RecordV
     private SelectionTracker<Long> selectionTracker;
     private NamedPredicate<Record> recordPredicate;
 
-    RecordsViewAdapter(MainActivity mainActivity, List<Record> records) {
+    RecordsViewAdapter(@NonNull MainActivity mainActivity, @NonNull List<Record> records) {
         this.mainActivity = mainActivity;
         this.records = records;
         this.filteredRecords = filterRecords(records, recordPredicate);
         this.idToRecord = buildIdToRecord(records);
         setHasStableIds(true);
+        this.recordsSectionIndexer = new RecordSectionIndexer(filteredRecords);
     }
 
     @Override
@@ -130,11 +135,12 @@ class RecordsViewAdapter extends RecyclerView.Adapter<RecordsViewAdapter.RecordV
         return out;
     }
 
-    void setRecords(List<Record> records) {
+    void setRecords(@NonNull List<Record> records) {
         this.records = records;
         this.idToRecord = buildIdToRecord(records);
         this.filteredRecords = filterRecords(records, recordPredicate);
         notifyDataSetChanged();
+        this.recordsSectionIndexer.updateSections(filteredRecords);
     }
 
     private Map<Long, Record> buildIdToRecord(@NonNull List<Record> records) {
@@ -165,8 +171,8 @@ class RecordsViewAdapter extends RecyclerView.Adapter<RecordsViewAdapter.RecordV
         return idToRecord.get(id);
     }
 
-    void deleteRecords(List<Record> recordsToDelete) {
-        if (recordsToDelete != null && !recordsToDelete.isEmpty()) {
+    void deleteRecords(@NonNull List<Record> recordsToDelete) {
+        if (!recordsToDelete.isEmpty()) {
             for (Record record : recordsToDelete) {
                 records.remove(record);
                 int position = filteredRecords.indexOf(record);
@@ -177,15 +183,16 @@ class RecordsViewAdapter extends RecyclerView.Adapter<RecordsViewAdapter.RecordV
                 }
             }
         }
+        recordsSectionIndexer.updateSections(filteredRecords);
     }
 
     void setPredicate(final NamedPredicate<Record> recordPredicate) {
         Log.i(this.getClass().getSimpleName(), "Set predicate " + recordPredicate);
         this.recordPredicate = recordPredicate;
         this.filteredRecords = filterRecords(records, recordPredicate);
-        // TODO
         notifyDataSetChanged();
         mainActivity.onRecordFilterUpdated();
+        recordsSectionIndexer.updateSections(filteredRecords);
     }
 
     @Nullable
@@ -227,6 +234,21 @@ class RecordsViewAdapter extends RecyclerView.Adapter<RecordsViewAdapter.RecordV
         clearPredicate();
         updateRecord(records.get(0).getId());
         this.notifyItemChanged(0);
+    }
+
+    @Override
+    public Object[] getSections() {
+        return recordsSectionIndexer.getSections();
+    }
+
+    @Override
+    public int getPositionForSection(int sectionIndex) {
+        return recordsSectionIndexer.getPositionForSection(sectionIndex);
+    }
+
+    @Override
+    public int getSectionForPosition(int position) {
+        return recordsSectionIndexer.getSectionForPosition(position);
     }
 
     static final class RecordViewHolder extends RecyclerView.ViewHolder {

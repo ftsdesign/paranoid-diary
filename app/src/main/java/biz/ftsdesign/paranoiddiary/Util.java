@@ -23,10 +23,10 @@ import biz.ftsdesign.paranoiddiary.model.Tag;
 import biz.ftsdesign.paranoiddiary.predicate.TagPredicate;
 
 public class Util {
-    @SuppressWarnings("SameParameterValue")
-    static void toastShort(@Nullable Activity activity, @NonNull String message) {
+
+    static void toastLong(@Nullable Activity activity, @NonNull String message) {
         if (activity != null) {
-            Toast toast = Toast.makeText(activity.getApplicationContext(), message, Toast.LENGTH_SHORT);
+            Toast toast = Toast.makeText(activity.getApplicationContext(), message, Toast.LENGTH_LONG);
             toast.show();
         }
     }
@@ -66,7 +66,7 @@ public class Util {
         if (!record.getTags().isEmpty()) {
             int index = 0;
             for (Tag tag : record.getTags()) {
-                TextView textViewTag = (TextView) activity.getLayoutInflater().inflate(R.layout.tag_button_layout, null);
+                TextView textViewTag = (TextView) activity.getLayoutInflater().inflate(R.layout.tag_button_layout, tagsBox, false);
                 textViewTag.setText("#" + tag.getName());
                 FlexboxLayout.LayoutParams layoutParams = new FlexboxLayout.LayoutParams(
                         FlexboxLayout.LayoutParams.WRAP_CONTENT,

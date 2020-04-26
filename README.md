@@ -1,7 +1,7 @@
 # Paranoid Diary
-Paranoid Diary is a secure personal diary Android app, a product by FTS Design.
-https://ftsdesign.biz/
-https://play.google.com/store/apps/details?id=biz.ftsdesign.paranoiddiary&hl=en_SG
+Paranoid Diary is a secure personal diary Android app, a product by FTS Design.  
+https://ftsdesign.biz/  
+https://play.google.com/store/apps/details?id=biz.ftsdesign.paranoiddiary&hl=en_SG  
 
 ## Features
 
@@ -16,4 +16,6 @@ https://play.google.com/store/apps/details?id=biz.ftsdesign.paranoiddiary&hl=en_
 - Light and dark themes available
 - You can delete all records or a single record
 - Records are immutable, once you wrote it you can't edit it, you can only change the tags
- 
+
+## Feedback
+You can request the new features and report the bugs on Paranoid Diary GitHub page https://github.com/ftsdesign/paranoid-diary

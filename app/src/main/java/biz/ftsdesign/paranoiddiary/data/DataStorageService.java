@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import biz.ftsdesign.paranoiddiary.model.GeoTag;
 import biz.ftsdesign.paranoiddiary.model.Record;
 import biz.ftsdesign.paranoiddiary.model.Tag;
 
@@ -64,7 +65,7 @@ public class DataStorageService extends Service implements PasswordListener {
         return record;
     }
 
-    public synchronized void updateRecordAndTags(@NonNull Record record) throws GeneralSecurityException {
+    public synchronized void updateRecordAndTags(@NonNull Record record) throws GeneralSecurityException, DataException {
         if (crypto == null)
             throw new GeneralSecurityException("No password");
         Log.i(this.getClass().getSimpleName(), "update " + record);
@@ -74,16 +75,18 @@ public class DataStorageService extends Service implements PasswordListener {
     }
 
     @NonNull
-    public synchronized Record createNewRecord(@NonNull Record record) throws GeneralSecurityException {
+    public synchronized Record createNewRecord(int diaryId, GeoTag geoTag) throws GeneralSecurityException {
         if (crypto == null)
             throw new GeneralSecurityException("No password");
+        final Record record = new Record(-1);
+        record.setDiaryId(diaryId);
+        record.setGeoTag(geoTag);
         record.setTimeCreated(System.currentTimeMillis());
         record.setTimeUpdated(record.getTimeCreated());
-        final Record out = dbHelper.create(record, crypto);
-        dbHelper.updateRecordTagMappings(record);
-        reloadRecordTagMappings();
-        Log.i(this.getClass().getCanonicalName(), "createNewRecord completed " + out);
-        return out;
+
+        final Record recordWithId = dbHelper.create(record, crypto);
+        Log.i(this.getClass().getCanonicalName(), "createNewRecord completed " + recordWithId);
+        return recordWithId;
     }
 
     @NonNull
@@ -159,7 +162,8 @@ public class DataStorageService extends Service implements PasswordListener {
         return result;
     }
 
-    public synchronized void cleanup() {
+    @SuppressWarnings("unused") // For future use
+    private synchronized void cleanup() {
         Log.i(this.getClass().getSimpleName(), "cleanup");
         dbHelper.deleteZeroLengthRecords(crypto);
         // TODO delete orphan tag mappings

@@ -110,7 +110,7 @@ class DBHelper extends SQLiteOpenHelper {
         return tag;
     }
 
-    void updateTextAndTimestamp(@NonNull final Record record, @NonNull final CryptoModule crypto) throws GeneralSecurityException {
+    void updateTextAndTimestamp(@NonNull final Record record, @NonNull final CryptoModule crypto) throws GeneralSecurityException, DataException {
         // We only update text or tags
         ContentValues values = new ContentValues();
         values.put(RecordTable.COLUMN_TIME_UPDATED, record.getTimeUpdated());
@@ -122,8 +122,9 @@ class DBHelper extends SQLiteOpenHelper {
 
         String[] whereArgs = {String.valueOf(record.getId())};
         int rowsUpdated = db.update(RecordTable.TABLE_NAME, values,  RecordTable._ID + " = ?", whereArgs);
+        // This is critical
         if (rowsUpdated != 1)
-            Log.wtf(this.getClass().getSimpleName(), "Can't update record #" + record.getId() + ": rows updated: " + rowsUpdated);
+            throw new DataException("Can't update record #" + record.getId() + ": rowsUpdated=" + rowsUpdated);
     }
 
     void updateTagName(@NonNull final Tag tag, @NonNull final CryptoModule crypto) throws GeneralSecurityException {

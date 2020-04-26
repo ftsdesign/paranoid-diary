@@ -74,7 +74,6 @@ public class MainActivity extends AppCompatActivity
         public void onServiceConnected(ComponentName name, IBinder service) {
             DataStorageService.DataStorageServiceBinder binder = (DataStorageService.DataStorageServiceBinder) service;
             dataStorageService = binder.getService();
-            dataStorageService.cleanup();
             if (!TransientPasswordStorage.isSet()) {
                 setControlsEnabled(false);
                 if (dataStorageService.isPasswordSet()) {
@@ -303,12 +302,9 @@ public class MainActivity extends AppCompatActivity
 
     private void onWrite() throws GeneralSecurityException {
         recordsCountBeforeWrite = recordsViewAdapter.getItemCountUnfiltered();
-        Record record = new Record(-1);
-        record.setDiaryId(DataUtils.DEFAULT_DIARY_ID);
-        record.setGeoTag(GeoUtils.getGeoTag(this));
-        record = dataStorageService.createNewRecord(record);
+        Record newEmptyRecord = dataStorageService.createNewRecord(DataUtils.DEFAULT_DIARY_ID, GeoUtils.getGeoTag(this));
         Intent intent = new Intent(MainActivity.this, WriteActivity.class);
-        intent.putExtra(KEY_RECORD_ID, record.getId());
+        intent.putExtra(KEY_RECORD_ID, newEmptyRecord.getId());
         startActivity(intent);
     }
 

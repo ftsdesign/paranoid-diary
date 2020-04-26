@@ -31,6 +31,7 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import biz.ftsdesign.paranoiddiary.data.DataException;
 import biz.ftsdesign.paranoiddiary.data.DataStorageService;
 import biz.ftsdesign.paranoiddiary.data.DataUtils;
 import biz.ftsdesign.paranoiddiary.model.Record;
@@ -236,7 +237,7 @@ public class WriteActivity extends AppCompatActivity implements ModifyTagsListen
                 }
                 lastSaved = System.currentTimeMillis();
 
-            } catch (GeneralSecurityException e) {
+            } catch (GeneralSecurityException | DataException e) {
                 Util.toastException(WriteActivity.this, e);
             }
         }

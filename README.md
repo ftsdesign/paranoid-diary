@@ -1,5 +1,5 @@
 # Paranoid Diary
-Paranoid Diary is a secure personal diary Android app, a product by FTS Design.  
+Paranoid Diary is a secure offline personal diary Android app, a product by FTS Design.  
 https://ftsdesign.biz/  
 https://play.google.com/store/apps/details?id=biz.ftsdesign.paranoiddiary&hl=en_SG  
 
@@ -7,6 +7,7 @@ https://play.google.com/store/apps/details?id=biz.ftsdesign.paranoiddiary&hl=en_
 
 - As secure as it can be on a mobile device
 - Password is required to access the diary
+- Works entirely offline, you don't need any data connection
 - Records can be tagged, to help finding all records on a particular subject
 - You can add tags to the record inline, by simply typing #yourtagname
 - Optional geotagging

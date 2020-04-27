@@ -35,8 +35,8 @@ public class DataStorageService extends Service implements PasswordListener {
     private DBHelper dbHelper;
 
     // Data structures to keep all tags in memory
-    private SortedMap<String, Tag> tagStringToTag = new TreeMap<>();
-    private Map<Long, Tag> idToTag = new HashMap<>();
+    private final SortedMap<String, Tag> tagStringToTag = new TreeMap<>(String::compareToIgnoreCase);
+    private final Map<Long, Tag> idToTag = new HashMap<>();
     private Map<Long,List<Long>> recordIdToTagIds = new HashMap<>();
     private boolean allTagsLoaded = false;
 

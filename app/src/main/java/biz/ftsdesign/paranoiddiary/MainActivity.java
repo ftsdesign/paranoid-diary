@@ -554,11 +554,11 @@ public class MainActivity extends AppCompatActivity
                     .setMessage(message)
                     .setPositiveButton(android.R.string.yes, (dialog, whichButton) -> {
                         try {
-                            dataStorageService.deleteRecords(recordsToDelete);
+                            int deletedRecords = dataStorageService.deleteRecords(recordsToDelete);
                             recordsViewAdapter.deleteRecords(recordsToDelete);
                             selectionTracker.clearSelection();
                             onRecordFilterUpdated();
-                            Toast.makeText(MainActivity.this, getString(R.string.toast_records_deleted, recordsToDelete.size()), Toast.LENGTH_LONG).show();
+                            Toast.makeText(MainActivity.this, getString(R.string.toast_records_deleted, deletedRecords), Toast.LENGTH_LONG).show();
                         } catch (GeneralSecurityException e) {
                             Util.toastException(MainActivity.this, e);
                         }

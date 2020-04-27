@@ -139,13 +139,14 @@ public class DataStorageService extends Service implements PasswordListener {
         return records;
     }
 
-    public synchronized void deleteRecordAndTagMappings(long recordId) throws GeneralSecurityException {
+    public synchronized int deleteRecordAndTagMappings(long recordId) throws GeneralSecurityException {
         if (crypto == null)
             throw new GeneralSecurityException("No password");
         Log.i(this.getClass().getCanonicalName(), "delete " + recordId);
-        dbHelper.deleteRecord(recordId);
+        int deletedRecords = dbHelper.deleteRecord(recordId);
         dbHelper.clearTagsForRecord(recordId);
         reloadRecordTagMappings();
+        return deletedRecords;
     }
 
     public boolean isPasswordCorrect() {
@@ -165,7 +166,7 @@ public class DataStorageService extends Service implements PasswordListener {
     @SuppressWarnings("unused") // For future use
     private synchronized void cleanup() {
         Log.i(this.getClass().getSimpleName(), "cleanup");
-        dbHelper.deleteZeroLengthRecords(crypto);
+        // TODO zero length records
         // TODO delete orphan tag mappings
     }
 
@@ -230,10 +231,12 @@ public class DataStorageService extends Service implements PasswordListener {
         return out;
     }
 
-    public synchronized void deleteRecords(@NonNull List<Record> recordsToDelete) throws GeneralSecurityException {
+    public synchronized int deleteRecords(@NonNull List<Record> recordsToDelete) throws GeneralSecurityException {
+        int deletedRecords = 0;
         for (Record record : recordsToDelete) {
-            deleteRecordAndTagMappings(record.getId());
+            deletedRecords += deleteRecordAndTagMappings(record.getId());
         }
+        return deletedRecords;
     }
 
     public synchronized void globalChangePassword(String newPassword) throws GeneralSecurityException {

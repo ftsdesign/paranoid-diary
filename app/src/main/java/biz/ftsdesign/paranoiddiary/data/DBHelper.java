@@ -121,7 +121,7 @@ class DBHelper extends SQLiteOpenHelper {
         }
 
         String[] whereArgs = {String.valueOf(record.getId())};
-        int rowsUpdated = db.update(RecordTable.TABLE_NAME, values,  RecordTable._ID + " = ?", whereArgs);
+        int rowsUpdated = db.updateWithOnConflict(RecordTable.TABLE_NAME, values,  RecordTable._ID + " = ?", whereArgs, SQLiteDatabase.CONFLICT_ROLLBACK);
         // This is critical
         if (rowsUpdated != 1)
             throw new DataException("Can't update record #" + record.getId() + ": rowsUpdated=" + rowsUpdated);
@@ -279,7 +279,7 @@ class DBHelper extends SQLiteOpenHelper {
         }
     }
 
-    void deleteRecord(long recordId) {
+    int deleteRecord(long recordId) {
         String selection = RecordTable._ID + " = ?";
         String[] selectionArgs = {String.valueOf(recordId)};
         int deletedRows = db.delete(RecordTable.TABLE_NAME, selection, selectionArgs);
@@ -287,6 +287,7 @@ class DBHelper extends SQLiteOpenHelper {
             Log.wtf(this.getClass().getSimpleName(), "Can't delete record #" + recordId + ": rows deleted: " + deletedRows);
         else
             Log.i(this.getClass().getSimpleName(), "Deleted record #" + recordId);
+        return deletedRows;
     }
 
     void deleteTag(long tagId) {
@@ -332,49 +333,6 @@ class DBHelper extends SQLiteOpenHelper {
         }
 
         return false;
-    }
-
-    void deleteZeroLengthRecords(@NonNull final CryptoModule crypto) {
-        if (!TransientPasswordStorage.isSet())
-            return;
-
-        try {
-            Log.i(this.getClass().getSimpleName(), "Deleting records with ecrypted text len < " + crypto.getMinLength());
-            for (long id : getZeroLengthRecordIds(crypto)) {
-                Log.i(this.getClass().getSimpleName(), "Deleting empty record " + id);
-                deleteRecord(id);
-                clearTagsForRecord(id);
-            }
-
-        } catch (Exception e) {
-            Log.wtf(this.getClass().getSimpleName(), e.toString(), e);
-        }
-    }
-
-    @NonNull
-    private List<Long> getZeroLengthRecordIds(@NonNull CryptoModule crypto) {
-        final List<Long> recordIdsToDelete = new LinkedList<>();
-        // TODO if we can query on byte field length, this can be optimized, got no time to research yet
-        try (Cursor cursor = db.query(RecordTable.TABLE_NAME,
-                new String[]{RecordTable._ID, RecordTable.COLUMN_ENCRYPTED_TEXT},
-                null,
-                null,
-                null, null,
-                null)) {
-
-            while (cursor.moveToNext()) {
-                boolean delete = false;
-                long id = cursor.getLong(cursor.getColumnIndexOrThrow(RecordTable._ID));
-                byte[] enc = cursor.getBlob(cursor.getColumnIndexOrThrow(RecordTable.COLUMN_ENCRYPTED_TEXT));
-                if (enc == null || enc.length < crypto.getMinLength()) {
-                    delete = true;
-                }
-                if (delete) {
-                    recordIdsToDelete.add(id);
-                }
-            }
-        }
-        return recordIdsToDelete;
     }
 
     @NonNull

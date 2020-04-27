@@ -197,7 +197,7 @@ public class WriteActivity extends AppCompatActivity implements ModifyTagsListen
 
             addRecordTagsFromText(record);
             saved = saveCurrentRecord(record);
-            Util.toastLong(this, "Record #" + record.getId() + " " + (saved ? "saved" : "NOT SAVED"));
+            Util.toastLong(this, "Record " + (saved ? "saved" : "NOT SAVED"));
         }
     }
 
@@ -234,6 +234,7 @@ public class WriteActivity extends AppCompatActivity implements ModifyTagsListen
                     String msg = "Record #" + record.getId() + " has no text, deleting";
                     Log.i(WriteActivity.class.getSimpleName(), msg);
                     dataStorageService.deleteRecordAndTagMappings(record.getId());
+                    Util.toastLong(this, "Record has no text, deleting");
                 }
                 lastSaved = System.currentTimeMillis();
 

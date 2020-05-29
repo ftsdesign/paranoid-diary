@@ -1,4 +1,11 @@
 <resources>
+    <!-- These values are used as keys, do not translate -->
+    <string name="pref_theme">theme</string>
+    <string name="pref_key_backup">backup</string>
+    <string name="pref_key_delete_all_data">delete_all_data</string>
+    <string name="pref_key_geotagging_enabled">pref_key_geotagging_enabled</string>
+    <!-- /These values are used as keys, do not translate -->
+
     <string name="app_name">Paranoid Diary</string>
     <string name="title_activity_settings">PD:Settings</string>
     <string name="action_settings">Settings</string>
@@ -55,7 +62,6 @@
     <string name="lock">Lock</string>
     <string name="unlock">Unlock</string>
     <string name="action_export">Export as password protected zip</string>
-    <string name="pref_theme">theme</string>
     <string name="deleting_all_data">Deleting all data…</string>
     <string name="settings_password">Enter password:</string>
     <string name="settings_password2">Repeat password:</string>
@@ -70,9 +76,6 @@
     <string name="permissions">Permissions</string>
     <string name="enable_geotagging">Enable auto geotagging</string>
     <string name="enable_geotagging_summary">Diary records will be automatically geotagged with the current location</string>
-    <string name="pref_key_geotagging_enabled">pref_key_geotagging_enabled</string>
-    <string name="pref_key_backup">backup</string>
-    <string name="pref_key_delete_all_data">delete_all_data</string>
     <string name="action_delete">Delete</string>
     <string name="pref_change_password">Change password</string>
     <string name="pref_key_change_password">pref_key_change_password</string>

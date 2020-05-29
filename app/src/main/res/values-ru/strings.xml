@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- These values are used as keys, do not translate -->
+    <string name="pref_theme">theme</string>
+    <string name="pref_key_backup">backup</string>
+    <string name="pref_key_delete_all_data">delete_all_data</string>
+    <string name="pref_key_geotagging_enabled">pref_key_geotagging_enabled</string>
+    <!-- /These values are used as keys, do not translate -->
+
+    <string name="app_name">Дневник Параноика</string>
+    <string name="title_activity_settings">ДП:Настройки</string>
+    <string name="action_settings">Настройки</string>
+    <string name="title_activity_about">ДП:О программе</string>
+    <string name="action_about">О программе</string>
+    <string name="title_activity_write">ДП:Запись</string>
+    <string name="about_text"><![CDATA[
+        <p>Телефон - плохое место для секретов. Если правительство, корпорации или бандиты с пушками
+        будут охотиться конкретно за вами - ничто вам не поможет. Но от чего можно защититься - так это от хакеров-любителей
+        и нецеленаправленного сбора персональных данных - и это как раз то, в чём <b>Дневник Параноика</b> может вам помочь.</p>
+
+        <h1>Чем вы можете это доказать?</h1>
+        <ul>
+            <li>Это приложение не требует никаких разрешений, кроме геолокации - и только если вы сами включаете автоматические гео метки.
+            Вы можете легко проверить это в PlayStore - app - About the app - App permissions - see more. <b>Дневник Параноика</b> НЕ ИСПОЛЬЗУЕТ
+            сеть, и не хранит данные в файловой системе смартфона. Единственный способ вынуть данные из
+            <b>Дневника Параноика</b> - это если вы сами сознательно ими поделитесь.</li>
+            <li>Исходники приложения полностью открыты на https://github.com/ftsdesign/paranoid-diary. Вы можете проверить всё сами,
+            или даже собрать собственную версию не из Google Play Store. Там же можно сообщать об ошибках или голосовать за новые возможности.</li>
+            <li>Вся текстовая информация (текст записей и метки) зашифрована 256-битным алгоритмом RSA,
+            так что даже если злоумышленник получит доступ к приватному хранилищу данных приложения, он не сможет прочитать текст. Важное следствие
+            из этого - если вы забудете пароль, нет абсолютно никакой возможности вернуть доступ к вашим данным.</li>
+            <li>Для резервного копирования используется запароленный ZIP. Рекомендуемый способ извлечения резервной копии со смартфона -
+            прямое Bluetooth соединение с устройством, которому вы доверяете, не используя никаких программ или сервисов посредников.</li>
+        </ul>
+
+        <p><b>Дневник Параноика</b> <b>НЕ ЯВЛЯЕТСЯ</b> дневником, которым вы можете делиться с друзьями. Он предназначен для того, чтобы сохранять очень личную
+        информацию только для себя.</p>
+
+        <h1>Основные возможности</h1>
+        <ul>
+            <li>Работает без сети (offline) - <b>Дневник Параноика</b> никогда не использует сеть и передачу данных. Вы можете пользоваться им вне зоны доступа.</li>
+            <li>Метки облегчают поиск записей по теме.</li>
+            <li>Записи невозможно изменять. Вы можете удалить запись целиком, но не можете переписать историю.</li>
+        </ul>
+
+        ]]></string>
+    <string name="write_here">Пишите здесь</string>
+
+    <!-- Preference Titles -->
+    <string name="appearance_header">Вид</string>
+    <string name="data_header">Данные</string>
+    <string name="color_theme">Цветовая схема</string>
+
+    <!-- Sync Preferences -->
+    <string name="pref_delete_all_data">Стереть все данные</string>
+    <string name="pref_delete_all_data_summary">Необратимо удалить все ваши записи</string>
+    <string name="confirm">Подтвердить</string>
+    <string name="delete_all_confirm">Вы действительно хотите удалить весь дневник?</string>
+    <string name="action_share">Поделиться</string>
+    <string name="enter_password">Введите пароль</string>
+    <string name="incorrect_password">Неверный пароль, попробуйте снова</string>
+    <string name="lock">Закрыть</string>
+    <string name="unlock">Открыть</string>
+    <string name="action_export">Экспортировать как запароленный zip</string>
+    <string name="deleting_all_data">Удаляю все данные…</string>
+    <string name="settings_password">Введите пароль:</string>
+    <string name="settings_password2">Повторите пароль:</string>
+    <string name="cancel">Отменить</string>
+    <string name="export">Экспорт</string>
+    <string name="passwords_dont_match">Пароли не совпадают</string>
+    <string name="password_cant_be_empty">Пароль не может быть пустым</string>
+    <string name="set_password_for_zip_file">Установите пароль для zip файла</string>
+    <string name="pref_backup">Резервная копия</string>
+    <string name="pref_backup_summary">Сохранить весь дневник в zip файл</string>
+    <string name="settings_output_format">Формат:</string>
+    <string name="permissions">Разрешения</string>
+    <string name="enable_geotagging">Разрешить авто гео метку</string>
+    <string name="enable_geotagging_summary">Записи будут автоматически помечены текущим местоположением</string>
+    <string name="action_delete">Удалить</string>
+    <string name="pref_change_password">Поменять пароль</string>
+    <string name="pref_key_change_password">pref_key_change_password</string>
+    <string name="pref_change_password_summary">Может занять некоторое время, в зависимости от количества записей</string>
+    <string name="settings_old_password">Старый пароль:</string>
+    <string name="settings_new_password">Новый пароль:</string>
+    <string name="settings_repeat_new_password">Повторите новый пароль:</string>
+    <string name="change_password_dialog_title">Изменить пароль</string>
+    <string name="new_pass_must_be_different">Новый пароль не может совпадать со старым</string>
+    <string name="incorrect_old_password">Старый пароль неверен</string>
+    <string name="new_passwords_dont_match">Новые пароли не совпадают</string>
+    <string name="action_filter">Фильтр</string>
+    <string name="action_tag">Метки</string>
+    <string name="set_tags">Установить метки</string>
+    <string name="records_affected">Записи: %d</string>
+    <string name="title_activity_main">ДП</string>
+    <string name="setup">Настройки</string>
+    <string name="done">Готово</string>
+    <string name="are_you_sure_delete_record">Вы уверены что хотите необратимо удалить запись %s \"%s\"?</string>
+    <string name="toast_records_deleted">Записи удалены: %d</string>
+    <string name="new_tag">Новая метка</string>
+    <string name="action_clear_filter">Очистить фильтр</string>
+
+    <string-array name="backup_formats_array">
+        <item>Текст</item>
+        <item>JSON</item>
+    </string-array>
+</resources>

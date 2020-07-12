@@ -136,32 +136,34 @@ public class WriteActivity extends AppCompatActivity implements ModifyTagsListen
 
             @Override
             public void afterTextChanged(Editable e) {
-                WriteActivity.this.onTextChanged(e);
+                WriteActivity.this.onTextChanged(e, record);
             }
         });
     }
 
-    private void onTextChanged(@NonNull Editable editable) {
-        updateRecordFromUI(editable, record);
+    private void onTextChanged(@Nullable Editable editable, @Nullable Record record) {
+        if (editable != null && record != null) {
+            updateRecordFromUI(editable, record);
 
-        final long now = System.currentTimeMillis();
-        final long timeSinceLastSavedMs = now - lastSaved;
-        if (timeSinceLastSavedMs > MIN_AUTOSAVE_INTERVAL_MS) {
-            // Enough time has passed since last save, can save immediately
-            saveCurrentRecord(record);
+            final long now = System.currentTimeMillis();
+            final long timeSinceLastSavedMs = now - lastSaved;
+            if (timeSinceLastSavedMs > MIN_AUTOSAVE_INTERVAL_MS) {
+                // Enough time has passed since last save, can save immediately
+                saveCurrentRecord(record);
 
-        } else {
-            // Schedule save later, if not already scheduled
-            if (saveTextOnUpdateTimerTask == null) {
-                saveTextOnUpdateTimerTask = new TimerTask() {
-                    @Override
-                    public void run() {
-                        saveCurrentRecord(record);
-                        saveTextOnUpdateTimerTask = null;
-                    }
-                };
-                long delay = MIN_AUTOSAVE_INTERVAL_MS - timeSinceLastSavedMs;
-                timer.schedule(saveTextOnUpdateTimerTask, delay);
+            } else {
+                // Schedule save later, if not already scheduled
+                if (saveTextOnUpdateTimerTask == null) {
+                    saveTextOnUpdateTimerTask = new TimerTask() {
+                        @Override
+                        public void run() {
+                            saveCurrentRecord(record);
+                            saveTextOnUpdateTimerTask = null;
+                        }
+                    };
+                    long delay = MIN_AUTOSAVE_INTERVAL_MS - timeSinceLastSavedMs;
+                    timer.schedule(saveTextOnUpdateTimerTask, delay);
+                }
             }
         }
     }

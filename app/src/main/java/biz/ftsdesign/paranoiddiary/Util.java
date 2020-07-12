@@ -26,8 +26,12 @@ public class Util {
 
     static void toastLong(@Nullable Activity activity, @NonNull String message) {
         if (activity != null) {
-            Toast toast = Toast.makeText(activity.getApplicationContext(), message, Toast.LENGTH_LONG);
-            toast.show();
+            try {
+                Toast toast = Toast.makeText(activity.getApplicationContext(), message, Toast.LENGTH_LONG);
+                toast.show();
+            } catch (RuntimeException e) {
+                Log.wtf("Unexpected error", e);
+            }
         }
     }
 
@@ -38,10 +42,16 @@ public class Util {
         }
     }
 
-    static void toastError(@NonNull Activity activity, @NonNull String message) {
-        Log.e(activity.getClass().getCanonicalName(), message);
-        Toast toast = Toast.makeText(activity.getApplicationContext(), message, Toast.LENGTH_SHORT);
-        toast.show();
+    static void toastError(@Nullable Activity activity, @NonNull String message) {
+        Log.e(activity != null ? activity.getClass().getCanonicalName() : "No activity", message);
+        if (activity != null) {
+            try {
+                Toast toast = Toast.makeText(activity.getApplicationContext(), message, Toast.LENGTH_SHORT);
+                toast.show();
+            } catch (RuntimeException e) {
+                Log.wtf("Unexpected error", e);
+            }
+        }
     }
 
     static void setThemeGlobal(String theme) {

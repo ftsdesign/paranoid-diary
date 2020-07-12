@@ -16,9 +16,8 @@
         <menu>
             <item
                 android:id="@+id/action_filter_tags"
-                android:icon="@drawable/ic_action_tag"
                 android:orderInCategory="100"
-                android:title=""/>
+                android:title="#"/>
             <item
                 android:id="@+id/action_clear_filter"
                 android:orderInCategory="100"
@@ -29,7 +28,7 @@
         android:id="@+id/action_tag"
         android:orderInCategory="100"
         android:title="@string/action_tag"
-        android:icon="@drawable/ic_action_tag"
+        android:icon="@drawable/ic_action_hashtag"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/action_share"

@@ -441,7 +441,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         NamedPredicate<Record> predicate = recordsViewAdapter.getRecordPredicate();
-        final String predicateText = predicate != null ? predicate.toString() : "";
+        final String predicateText = predicate != null ? predicate.toString() : "#";
         MenuItem tagFilterItem = menu.findItem(R.id.action_filter_tags);
         tagFilterItem.setTitle(predicateText);
     }

@@ -88,7 +88,7 @@
     <string name="incorrect_old_password">Old password is incorrect</string>
     <string name="new_passwords_dont_match">New passwords don\'t match</string>
     <string name="action_filter">Filter</string>
-    <string name="action_tag">Tag</string>
+    <string name="action_tag">#tag</string>
     <string name="set_tags">Set tags</string>
     <string name="records_affected">Records affected: %d</string>
     <string name="title_activity_main">PD</string>

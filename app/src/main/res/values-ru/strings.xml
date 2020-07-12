@@ -88,7 +88,7 @@
     <string name="incorrect_old_password">Старый пароль неверен</string>
     <string name="new_passwords_dont_match">Новые пароли не совпадают</string>
     <string name="action_filter">Фильтр</string>
-    <string name="action_tag">Метки</string>
+    <string name="action_tag">#метки</string>
     <string name="set_tags">Установить метки</string>
     <string name="records_affected">Записи: %d</string>
     <string name="title_activity_main">ДП</string>

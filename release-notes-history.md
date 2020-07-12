@@ -1,3 +1,8 @@
+# Release 1.5 (8) 12-Jul-2020
+
+Changes:
+- New icons
+
 # Release 1.4 (7) 29-May-2020
 
 Changes:

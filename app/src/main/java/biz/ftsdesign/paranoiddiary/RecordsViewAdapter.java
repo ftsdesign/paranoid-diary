@@ -89,7 +89,7 @@ class RecordsViewAdapter extends RecyclerView.Adapter<RecordsViewAdapter.RecordV
             holder.headerView.setText(Util.composeRecordHeader(record));
 
             if (record.getGeoTag() != null) {
-                @SuppressLint("DefaultLocale") String geoTagText = String.format("%f %f", record.getGeoTag().getLat(), record.getGeoTag().getLon());
+                @SuppressLint("DefaultLocale") String geoTagText = String.format("\uD83C\uDF10 %f %f", record.getGeoTag().getLat(), record.getGeoTag().getLon());
                 holder.geoTagView.setText(geoTagText);
                 holder.geoTagView.setVisibility(View.VISIBLE);
             } else {

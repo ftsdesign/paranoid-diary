@@ -1,3 +1,8 @@
+# Release 1.6 (9) 28-Jul-2020
+
+Changes:
+- Minor bugfixes
+
 # Release 1.5 (8) 12-Jul-2020
 
 Changes:

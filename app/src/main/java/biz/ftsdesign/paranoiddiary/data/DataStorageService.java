@@ -75,7 +75,7 @@ public class DataStorageService extends Service implements PasswordListener {
     }
 
     @NonNull
-    public synchronized Record createNewRecord(int diaryId, GeoTag geoTag) throws GeneralSecurityException {
+    public synchronized Record createNewRecord(int diaryId, GeoTag geoTag) throws GeneralSecurityException, DataException {
         if (crypto == null)
             throw new GeneralSecurityException("No password");
         final Record record = new Record(-1);

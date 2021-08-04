@@ -1,5 +1,7 @@
 package biz.ftsdesign.paranoiddiary.data;
 
+import static android.database.sqlite.SQLiteDatabase.CONFLICT_ROLLBACK;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -83,7 +85,7 @@ class DBHelper extends SQLiteOpenHelper {
     }
 
     @NonNull
-    Record create(@NonNull final Record record, @NonNull final CryptoModule crypto) throws GeneralSecurityException {
+    Record create(@NonNull final Record record, @NonNull final CryptoModule crypto) throws GeneralSecurityException, DataException {
         ContentValues values = new ContentValues();
         values.put(RecordTable.COLUMN_DIARY_ID, record.getDiaryId());
         values.put(RecordTable.COLUMN_TIME_CREATED, record.getTimeCreated());
@@ -96,7 +98,10 @@ class DBHelper extends SQLiteOpenHelper {
             values.put(RecordTable.COLUMN_LON, record.getGeoTag().getLon());
         }
 
-        long rowId = db.insert(RecordTable.TABLE_NAME, null, values);
+        final long rowId = db.insertWithOnConflict(RecordTable.TABLE_NAME, null, values, CONFLICT_ROLLBACK);
+        if (rowId <= 0) {
+            throw new DataException("Cannot insert a new record, exit code " + rowId);
+        }
 
         return new Record(rowId, record);
     }
@@ -121,7 +126,7 @@ class DBHelper extends SQLiteOpenHelper {
         }
 
         String[] whereArgs = {String.valueOf(record.getId())};
-        int rowsUpdated = db.updateWithOnConflict(RecordTable.TABLE_NAME, values,  RecordTable._ID + " = ?", whereArgs, SQLiteDatabase.CONFLICT_ROLLBACK);
+        int rowsUpdated = db.updateWithOnConflict(RecordTable.TABLE_NAME, values,  RecordTable._ID + " = ?", whereArgs, CONFLICT_ROLLBACK);
         // This is critical
         if (rowsUpdated != 1)
             throw new DataException("Can't update record #" + record.getId() + ": rowsUpdated=" + rowsUpdated);

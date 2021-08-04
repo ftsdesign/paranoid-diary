@@ -46,6 +46,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import biz.ftsdesign.paranoiddiary.data.DataException;
 import biz.ftsdesign.paranoiddiary.data.DataStorageService;
 import biz.ftsdesign.paranoiddiary.data.DataUtils;
 import biz.ftsdesign.paranoiddiary.data.PasswordListener;
@@ -267,7 +268,7 @@ public class MainActivity extends AppCompatActivity
         fab.setOnClickListener(view -> {
             try {
                 onWrite();
-            } catch (GeneralSecurityException e) {
+            } catch (GeneralSecurityException|DataException e) {
                 Util.toastException(MainActivity.this, e);
             }
         });
@@ -301,7 +302,7 @@ public class MainActivity extends AppCompatActivity
         GeoUtils.requestLocationUpdates(this);
     }
 
-    private void onWrite() throws GeneralSecurityException {
+    private void onWrite() throws GeneralSecurityException, DataException {
         recordsCountBeforeWrite = recordsViewAdapter.getItemCountUnfiltered();
         Record newEmptyRecord = dataStorageService.createNewRecord(DataUtils.DEFAULT_DIARY_ID, GeoUtils.getGeoTag(this));
         Intent intent = new Intent(MainActivity.this, WriteActivity.class);

@@ -45,11 +45,11 @@ public class WriteActivity extends AppCompatActivity implements ModifyTagsListen
     private Record record = null;
 
     // Autosave
-    private Timer timer = new Timer();
+    private final Timer timer = new Timer();
     private TimerTask saveTextOnUpdateTimerTask = null;
     private long lastSaved = 0;
 
-    private ServiceConnection connection = new ServiceConnection() {
+    private final ServiceConnection connection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             DataStorageService.DataStorageServiceBinder binder = (DataStorageService.DataStorageServiceBinder) service;

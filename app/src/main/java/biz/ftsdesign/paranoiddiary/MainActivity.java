@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity
     private SelectionTracker<Long> selectionTracker;
     private int recordsCountBeforeWrite;
 
-    private ServiceConnection connection = new ServiceConnection() {
+    private final ServiceConnection connection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             DataStorageService.DataStorageServiceBinder binder = (DataStorageService.DataStorageServiceBinder) service;

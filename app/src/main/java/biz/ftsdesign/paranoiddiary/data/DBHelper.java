@@ -103,7 +103,7 @@ class DBHelper extends SQLiteOpenHelper {
             throw new DataException("Cannot insert a new record, exit code " + rowId);
         }
 
-        return new Record(rowId, record);
+        return new Record(rowId, record); // New instance because we want the ID to be strictly immutable
     }
 
     Tag create(@NonNull final String tagName, @NonNull final CryptoModule crypto) throws GeneralSecurityException {

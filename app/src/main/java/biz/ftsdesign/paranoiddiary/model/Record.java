@@ -22,7 +22,7 @@ public class Record {
         this.tags = new TreeSet<>();
     }
 
-    public Record(final long id, final Record copy) {
+    public Record(final long id, @NonNull final Record copy) {
         this(id);
         this.diaryId = copy.diaryId;
         this.timeCreated = copy.timeCreated;

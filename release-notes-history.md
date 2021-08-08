@@ -1,3 +1,14 @@
+# Release 1.8 (11) 08-Aug-2021
+
+Changes:
+- Added diary info in Settings
+- Added version number in About
+
+# Release 1.7 (10) 04-Aug-2020
+
+Changes:
+- Show error message when the app can't create a new record (#6)
+
 # Release 1.6 (9) 28-Jul-2020
 
 Changes:

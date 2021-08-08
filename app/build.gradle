@@ -23,6 +23,7 @@ android {
     buildToolsVersion "30.0.2"
     defaultConfig {
         applicationId "biz.ftsdesign.paranoiddiary"
+        // Remember to update release-notes-history.md
         minSdkVersion 19
         targetSdkVersion 30
         versionCode 11

@@ -1,6 +1,24 @@
 apply plugin: 'com.android.application'
 
+def localPropertiesFile = file("local.properties");
+def localProperties = new Properties()
+localProperties.load(new FileInputStream(localPropertiesFile))
+
 android {
+    signingConfigs {
+        debug {
+            storeFile file(localProperties['storeFile'])
+            storePassword localProperties['storePassword']
+            keyAlias localProperties['keyAlias']
+            keyPassword localProperties['keyPassword']
+        }
+        release {
+            storeFile file(localProperties['storeFile'])
+            storePassword localProperties['storePassword']
+            keyAlias localProperties['keyAlias']
+            keyPassword localProperties['keyPassword']
+        }
+    }
     compileSdkVersion 30
     buildToolsVersion "30.0.2"
     defaultConfig {
@@ -16,6 +34,10 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+        debug {
+            signingConfig signingConfigs.debug
         }
     }
     compileOptions {

@@ -46,6 +46,10 @@
 
     <PreferenceCategory app:title="@string/data_header">
 
+        <Preference app:title="@string/pref_show_diary_info"
+            app:key="@string/pref_key_show_diary_info"
+            app:summary="@string/pref_show_diary_info_summary"/>
+
         <Preference app:title="@string/pref_change_password"
             app:key="@string/pref_key_change_password"
             app:summary="@string/pref_change_password_summary"/>

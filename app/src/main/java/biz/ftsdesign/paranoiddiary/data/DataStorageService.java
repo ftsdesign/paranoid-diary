@@ -338,6 +338,48 @@ public class DataStorageService extends Service implements PasswordListener {
         return tagStringToTag.get(tagName);
     }
 
+    public synchronized long getRecordsCount() {
+        final long recordsCount;
+        if (crypto == null) {
+            recordsCount = 0;
+        } else {
+            recordsCount = dbHelper.getRecordsCount();
+        }
+        return recordsCount;
+    }
+
+    public synchronized int getTagsCount() {
+        final int tagsCount;
+        if (crypto == null) {
+            tagsCount = 0;
+        } else {
+            tagsCount = tagStringToTag.size();
+        }
+        return tagsCount;
+    }
+
+    @Nullable
+    public Record getFirstRecord() {
+        return getFirstRecord(DBHelper.SortOrder.ASC);
+    }
+
+    @Nullable
+    public Record getLastRecord() {
+        return getFirstRecord(DBHelper.SortOrder.DESC);
+    }
+
+    @Nullable
+    private synchronized Record getFirstRecord(@NonNull DBHelper.SortOrder sortOrder) {
+        Record record = null;
+        if (crypto != null) {
+            try {
+                record = dbHelper.getFirstRecord(RecordTable.COLUMN_TIME_CREATED, sortOrder, crypto);
+            } catch (GeneralSecurityException e) {
+                Log.e(this.getClass().getSimpleName(), e.getMessage(), e);
+            }
+        }
+        return record;
+    }
 
     public class DataStorageServiceBinder extends Binder {
         public DataStorageService getService() {

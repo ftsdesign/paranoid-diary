@@ -206,12 +206,33 @@ class DBHelper extends SQLiteOpenHelper {
         return getAllRecordsNoTextByTimeDesc(diaryId, true, crypto);
     }
 
+    @Nullable
+    Record getFirstRecord(@NonNull String sortColumn, @NonNull SortOrder sortOrder, @NonNull final CryptoModule crypto) throws GeneralSecurityException {
+        long t1 = System.currentTimeMillis();
+        String sortOrderString = sortColumn + " " + sortOrder;
+        try (Cursor cursor = db.query(RecordTable.TABLE_NAME,
+                null,
+                null,
+                null,
+                null, null,
+                sortOrderString, "1")) {
+
+            Record record = null;
+            if (cursor.moveToFirst()) {
+                record = readRecord(cursor, true, crypto);
+            }
+            return record;
+        }
+    }
+
+    enum SortOrder { ASC, DESC }
+
     @NonNull
     private List<Record> getAllRecordsNoTextByTimeDesc(int diaryId, boolean loadText, final CryptoModule crypto) throws GeneralSecurityException {
         long t1 = System.currentTimeMillis();
         String selection = RecordTable.COLUMN_DIARY_ID + " = ?";
         String[] selectionArgs = { String.valueOf(diaryId) };
-        String sortOrder = RecordTable.COLUMN_TIME_CREATED + " desc";
+        String sortOrder = RecordTable.COLUMN_TIME_CREATED + " " + SortOrder.DESC;
         try (Cursor cursor = db.query(RecordTable.TABLE_NAME,
                 null,
                 selection,
@@ -457,4 +478,7 @@ class DBHelper extends SQLiteOpenHelper {
         return Arrays.equals(md5, hash);
     }
 
+    public long getRecordsCount() {
+        return DatabaseUtils.queryNumEntries(db, RecordTable.TABLE_NAME);
+    }
 }

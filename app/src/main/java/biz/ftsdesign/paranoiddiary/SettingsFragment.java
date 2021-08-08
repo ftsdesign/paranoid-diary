@@ -10,6 +10,10 @@ import androidx.fragment.app.DialogFragment;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
+import java.time.Instant;
+
+import biz.ftsdesign.paranoiddiary.model.Record;
+
 public class SettingsFragment extends PreferenceFragmentCompat {
     private static final String TAG_EXPORT_ZIP_DIALOG_FRAGMENT = "ExportZipDialogFragment";
     private static final String TAG_CHANGE_PASSWORD_DIALOG_FRAGMENT = "ChangePasswordDialogFragment";
@@ -48,6 +52,14 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                 return true;
             });
         }
+
+        Preference showDiaryInfoButton = getPreferenceManager().findPreference(getString(R.string.pref_key_show_diary_info));
+        if (showDiaryInfoButton != null) {
+            showDiaryInfoButton.setOnPreferenceClickListener(preference -> {
+                doShowDiaryInfo();
+                return true;
+            });
+        }
     }
 
     private void doChangePassword() {
@@ -70,5 +82,26 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                     ((SettingsActivity)getActivity()).getDataStorageService().deleteAllData();
                 })
                 .setNegativeButton(android.R.string.no, null).show();
+    }
+
+    private void doShowDiaryInfo() {
+        long recordsCount = settingsActivity.getDataStorageService().getRecordsCount();
+        String firstRecordTimestamp = "";
+        String lastRecordTimestamp = "";
+        if (recordsCount > 0) {
+            Record firstRecord = settingsActivity.getDataStorageService().getFirstRecord();
+            firstRecordTimestamp = Formats.format(Formats.TIMESTAMP_FORMAT, firstRecord.getTimeCreated());
+            Record lastRecord = settingsActivity.getDataStorageService().getLastRecord();
+            lastRecordTimestamp = Formats.format(Formats.TIMESTAMP_FORMAT, lastRecord.getTimeCreated());
+        }
+        int tagsCount = settingsActivity.getDataStorageService().getTagsCount();
+
+        String message = getString(R.string.diary_info_message, recordsCount, firstRecordTimestamp, lastRecordTimestamp, tagsCount);
+
+        new AlertDialog.Builder(getActivity())
+                .setTitle(getString(R.string.diary_info))
+                .setMessage(message)
+                .setIcon(R.drawable.ic_action_info)
+                .setPositiveButton(R.string.close, null).show();
     }
 }

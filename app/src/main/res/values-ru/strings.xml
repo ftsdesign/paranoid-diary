@@ -103,4 +103,10 @@
         <item>Текст</item>
         <item>JSON</item>
     </string-array>
+    <string name="pref_key_show_diary_info">show_diary_info</string>
+    <string name="pref_show_diary_info">Информация о дневнике</string>
+    <string name="pref_show_diary_info_summary">Статистика о данных в дневнике</string>
+    <string name="close">Закрыть</string>
+    <string name="diary_info">Информация о дневнике</string>
+    <string name="diary_info_message">Количество записей: %d\nПервая запись: %s\nПоследняя запись: %s\nКоличество меток: %d</string>
 </resources>

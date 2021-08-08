@@ -109,4 +109,6 @@
     <string name="close">Закрыть</string>
     <string name="diary_info">Информация о дневнике</string>
     <string name="diary_info_message">Количество записей: %d\nПервая запись: %s\nПоследняя запись: %s\nКоличество меток: %d</string>
+    <string name="version_info">Версия: %s (%d)</string>
+    <string name="version_unknown">Версия неизвестна</string>
 </resources>

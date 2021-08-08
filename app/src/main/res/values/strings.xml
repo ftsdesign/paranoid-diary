@@ -109,4 +109,6 @@
     <string name="close">Close</string>
     <string name="diary_info">Diary info</string>
     <string name="diary_info_message">Records count: %d\nFirst record: %s\nLast record: %s\nTags count: %d</string>
+    <string name="version_info">Version: %s (%d)</string>
+    <string name="version_unknown">Version unknown</string>
 </resources>

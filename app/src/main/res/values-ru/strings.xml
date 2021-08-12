@@ -1,12 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- These values are used as keys, do not translate -->
-    <string name="pref_theme">theme</string>
-    <string name="pref_key_backup">backup</string>
-    <string name="pref_key_delete_all_data">delete_all_data</string>
-    <string name="pref_key_geotagging_enabled">pref_key_geotagging_enabled</string>
-    <!-- /These values are used as keys, do not translate -->
-
     <string name="app_name">Дневник Параноика</string>
     <string name="title_activity_settings">ДП:Настройки</string>
     <string name="action_settings">Настройки</string>

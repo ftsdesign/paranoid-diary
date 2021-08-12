@@ -151,6 +151,14 @@ public class SettingsActivity extends AppCompatActivity implements
             sendIntent.setType(MIME_ZIP);
             Intent shareIntent = Intent.createChooser(sendIntent, null);
             startActivity(shareIntent);
+
+            /*
+            On minSdkVersion 19 we cannot be sure that the backup file was actually shared and saved successfully,
+            so whenever the chooser activity was launched, we count it as a backup.
+             */
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+            sharedPreferences.edit().putLong(getString(R.string.pref_key_last_backup_time), System.currentTimeMillis()).apply();
+
         } catch (Exception e) {
             Log.e(this.getClass().getCanonicalName(), e.getMessage(), e);
         }

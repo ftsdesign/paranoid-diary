@@ -1,9 +1,10 @@
 <resources>
     <!-- These values are used as keys, do not translate -->
-    <string name="pref_theme">theme</string>
-    <string name="pref_key_backup">backup</string>
-    <string name="pref_key_delete_all_data">delete_all_data</string>
-    <string name="pref_key_geotagging_enabled">pref_key_geotagging_enabled</string>
+    <string name="pref_theme" translatable="false">theme</string>
+    <string name="pref_key_backup" translatable="false">backup</string>
+    <string name="pref_key_delete_all_data" translatable="false">delete_all_data</string>
+    <string name="pref_key_geotagging_enabled" translatable="false">pref_key_geotagging_enabled</string>
+    <string name="pref_key_last_backup_time" translatable="false">pref_key_last_backup_time</string>
     <!-- /These values are used as keys, do not translate -->
 
     <string name="app_name">Paranoid Diary</string>

@@ -379,53 +379,54 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_about:
-                startActivity(new Intent(MainActivity.this, AboutActivity.class));
-                return true;
+        final int itemId = item.getItemId();
+        if (itemId == R.id.action_about) {
+            startActivity(new Intent(MainActivity.this, AboutActivity.class));
+            return true;
 
-            case R.id.action_settings:
-                startActivity(new Intent(MainActivity.this, SettingsActivity.class));
-                return true;
+        } else if (itemId == R.id.action_settings) {
+            startActivity(new Intent(MainActivity.this, SettingsActivity.class));
+            return true;
 
-            case R.id.action_tag:
-                doTagRecords();
-                return true;
+        } else if (itemId == R.id.action_tag) {
+            doTagRecords();
+            return true;
 
-            case R.id.action_clear_filter:
-                doClearFilter();
-                return true;
+        } else if (itemId == R.id.action_clear_filter) {
+            doClearFilter();
+            return true;
 
-            case R.id.action_filter_tags:
-                doSetFilterTags();
-                return true;
+        } else if (itemId == R.id.action_filter_tags) {
+            doSetFilterTags();
+            return true;
 
-            case R.id.action_share:
-                if (selectionTracker.hasSelection()) {
-                    doShare();
-                } else {
-                    toastSelectSomething();
-                }
-                return true;
+        } else if (itemId == R.id.action_share) {
+            if (selectionTracker.hasSelection()) {
+                doShare();
+            } else {
+                toastSelectSomething();
+            }
+            return true;
 
-            case R.id.action_delete:
-                if (selectionTracker.hasSelection()) {
-                    doDelete();
-                } else {
-                    toastSelectSomething();
-                }
-                return true;
+        } else if (itemId == R.id.action_delete) {
+            if (selectionTracker.hasSelection()) {
+                doDelete();
+            } else {
+                toastSelectSomething();
+            }
+            return true;
 
-            case R.id.action_toggle_lock:
-                if (TransientPasswordStorage.isSet()) {
-                    Log.i(this.getClass().getSimpleName(), "Locked on user action");
-                    TransientPasswordStorage.clear();
-                } else {
-                    getPasswordFromUser();
-                }
+        } else if (itemId == R.id.action_toggle_lock) {
+            if (TransientPasswordStorage.isSet()) {
+                Log.i(this.getClass().getSimpleName(), "Locked on user action");
+                TransientPasswordStorage.clear();
+            } else {
+                getPasswordFromUser();
+            }
+            return true;
 
-            default:
-                return super.onOptionsItemSelected(item);
+        } else {
+            return super.onOptionsItemSelected(item);
         }
     }
 

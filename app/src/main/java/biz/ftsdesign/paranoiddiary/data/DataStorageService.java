@@ -373,7 +373,7 @@ public class DataStorageService extends Service implements PasswordListener {
         Record record = null;
         if (crypto != null) {
             try {
-                record = dbHelper.getFirstRecord(RecordTable.COLUMN_TIME_CREATED, sortOrder, crypto);
+                record = dbHelper.getFirstRecord(sortOrder, crypto);
             } catch (GeneralSecurityException e) {
                 Log.e(this.getClass().getSimpleName(), e.getMessage(), e);
             }

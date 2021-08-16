@@ -58,6 +58,14 @@
             app:key="@string/pref_key_backup"
             app:summary="@string/pref_backup_summary"/>
 
+        <ListPreference
+            app:defaultValue="0"
+            app:entries="@array/backup_reminder_entries"
+            app:entryValues="@array/backup_reminder_values"
+            app:key="@string/pref_backup_reminder_days"
+            app:title="@string/backup_reminder"
+            app:useSimpleSummaryProvider="true" />
+
         <Preference app:title="@string/pref_delete_all_data"
             app:key="@string/pref_key_delete_all_data"
             app:summary="@string/pref_delete_all_data_summary"/>

@@ -5,6 +5,7 @@
     <string name="pref_key_delete_all_data" translatable="false">delete_all_data</string>
     <string name="pref_key_geotagging_enabled" translatable="false">pref_key_geotagging_enabled</string>
     <string name="pref_key_last_backup_time" translatable="false">pref_key_last_backup_time</string>
+    <string name="pref_backup_reminder_days" translatable="false">pref_backup_reminder</string>
     <!-- /These values are used as keys, do not translate -->
 
     <string name="app_name">Paranoid Diary</string>
@@ -112,4 +113,10 @@
     <string name="diary_info_message">Records count: %d\nFirst record: %s\nLast record: %s\nTags count: %d</string>
     <string name="version_info">Version: %s (%d)</string>
     <string name="version_unknown">Version unknown</string>
+    <string name="backup_reminder">Backup reminder</string>
+    <string name="backup_warning_title">Reminder</string>
+    <string name="do_backup_now">Do the backup now</string>
+    <string name="disable_backup_warning">Disable this warning</string>
+    <string name="dismiss">Dismiss</string>
+    <string name="backup_warning_text">You didn\'t do backup for longer than %d days</string>
 </resources>

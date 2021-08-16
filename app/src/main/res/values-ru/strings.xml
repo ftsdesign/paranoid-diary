@@ -104,4 +104,10 @@
     <string name="diary_info_message">Количество записей: %d\nПервая запись: %s\nПоследняя запись: %s\nКоличество меток: %d</string>
     <string name="version_info">Версия: %s (%d)</string>
     <string name="version_unknown">Версия неизвестна</string>
+    <string name="backup_reminder">Напоминать о резервной копии</string>
+    <string name="backup_warning_title">Напоминание</string>
+    <string name="disable_backup_warning">Отключить напоминание</string>
+    <string name="backup_warning_text">Вы не делали резервную копию дольше чем %d дней</string>
+    <string name="do_backup_now">Сделать сейчас</string>
+    <string name="dismiss">Закрыть</string>
 </resources>

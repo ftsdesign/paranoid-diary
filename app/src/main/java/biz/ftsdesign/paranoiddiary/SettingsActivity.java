@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
+import androidx.fragment.app.DialogFragment;
 import androidx.preference.PreferenceManager;
 
 import net.lingala.zip4j.io.outputstream.ZipOutputStream;
@@ -39,7 +40,9 @@ public class SettingsActivity extends AppCompatActivity implements
         SharedPreferences.OnSharedPreferenceChangeListener,
         ExportZipDialogFragment.ExportZipDialogListener,
         ChangePasswordDialogFragment.ChangePasswordDialogListener {
-
+    public static final String KEY_ACTION_ON_START = "actionOnStart";
+    public static final int ACTION_BACKUP = 1;
+    private static final String TAG_EXPORT_ZIP_DIALOG_FRAGMENT = "ExportZipDialogFragment";
     private DataStorageService dataStorageService;
 
     private final ServiceConnection connection = new ServiceConnection() {
@@ -67,7 +70,6 @@ public class SettingsActivity extends AppCompatActivity implements
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
-
     }
 
     @Override
@@ -154,10 +156,11 @@ public class SettingsActivity extends AppCompatActivity implements
 
             /*
             On minSdkVersion 19 we cannot be sure that the backup file was actually shared and saved successfully,
-            so whenever the chooser activity was launched, we count it as a backup.
+            so whenever the chooser activity was launched, we count it as a successful backup.
              */
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
             sharedPreferences.edit().putLong(getString(R.string.pref_key_last_backup_time), System.currentTimeMillis()).apply();
+            Log.i(this.getClass().getSimpleName(), "Backup time recorded");
 
         } catch (Exception e) {
             Log.e(this.getClass().getCanonicalName(), e.getMessage(), e);
@@ -186,5 +189,28 @@ public class SettingsActivity extends AppCompatActivity implements
         } catch (GeneralSecurityException e) {
             Util.toastException(this, e);
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        handleActionOnStart();
+    }
+
+    /**
+     * When we want the SettingsActivity not just open, but to start a specific action
+     */
+    private void handleActionOnStart() {
+        Bundle b = getIntent().getExtras();
+        if (b != null && b.containsKey(KEY_ACTION_ON_START)) {
+            if (b.getInt(KEY_ACTION_ON_START) == ACTION_BACKUP) {
+                doBackup();
+            }
+        }
+    }
+
+    void doBackup() {
+        DialogFragment dialog = new ExportZipDialogFragment();
+        dialog.show(getSupportFragmentManager(), TAG_EXPORT_ZIP_DIALOG_FRAGMENT);
     }
 }

@@ -10,12 +10,9 @@ import androidx.fragment.app.DialogFragment;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
-import java.time.Instant;
-
 import biz.ftsdesign.paranoiddiary.model.Record;
 
 public class SettingsFragment extends PreferenceFragmentCompat {
-    private static final String TAG_EXPORT_ZIP_DIALOG_FRAGMENT = "ExportZipDialogFragment";
     private static final String TAG_CHANGE_PASSWORD_DIALOG_FRAGMENT = "ChangePasswordDialogFragment";
     private SettingsActivity settingsActivity;
 
@@ -40,7 +37,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         Preference backupButton = getPreferenceManager().findPreference(getString(R.string.pref_key_backup));
         if (backupButton != null) {
             backupButton.setOnPreferenceClickListener(preference -> {
-                doBackup();
+                settingsActivity.doBackup();
                 return true;
             });
         }
@@ -67,11 +64,6 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         dialog.show(settingsActivity.getSupportFragmentManager(), TAG_CHANGE_PASSWORD_DIALOG_FRAGMENT);
     }
 
-    private void doBackup() {
-        DialogFragment dialog = new ExportZipDialogFragment();
-        dialog.show(settingsActivity.getSupportFragmentManager(), TAG_EXPORT_ZIP_DIALOG_FRAGMENT);
-    }
-
     private void confirmDeleteAllData() {
         new AlertDialog.Builder(getActivity())
                 .setTitle(getString(R.string.confirm))
@@ -90,9 +82,13 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         String lastRecordTimestamp = "";
         if (recordsCount > 0) {
             Record firstRecord = settingsActivity.getDataStorageService().getFirstRecord();
-            firstRecordTimestamp = Formats.format(Formats.TIMESTAMP_FORMAT, firstRecord.getTimeCreated());
+            if (firstRecord != null) {
+                firstRecordTimestamp = Formats.format(Formats.TIMESTAMP_FORMAT, firstRecord.getTimeCreated());
+            }
             Record lastRecord = settingsActivity.getDataStorageService().getLastRecord();
-            lastRecordTimestamp = Formats.format(Formats.TIMESTAMP_FORMAT, lastRecord.getTimeCreated());
+            if (lastRecord != null) {
+                lastRecordTimestamp = Formats.format(Formats.TIMESTAMP_FORMAT, lastRecord.getTimeCreated());
+            }
         }
         int tagsCount = settingsActivity.getDataStorageService().getTagsCount();
 

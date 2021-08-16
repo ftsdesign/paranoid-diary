@@ -207,9 +207,8 @@ class DBHelper extends SQLiteOpenHelper {
     }
 
     @Nullable
-    Record getFirstRecord(@NonNull String sortColumn, @NonNull SortOrder sortOrder, @NonNull final CryptoModule crypto) throws GeneralSecurityException {
-        long t1 = System.currentTimeMillis();
-        String sortOrderString = sortColumn + " " + sortOrder;
+    Record getFirstRecord(@NonNull SortOrder sortOrder, @NonNull final CryptoModule crypto) throws GeneralSecurityException {
+        String sortOrderString = RecordTable.COLUMN_TIME_CREATED + " " + sortOrder;
         try (Cursor cursor = db.query(RecordTable.TABLE_NAME,
                 null,
                 null,
@@ -219,7 +218,7 @@ class DBHelper extends SQLiteOpenHelper {
 
             Record record = null;
             if (cursor.moveToFirst()) {
-                record = readRecord(cursor, true, crypto);
+                record = readRecord(cursor, false, crypto);
             }
             return record;
         }

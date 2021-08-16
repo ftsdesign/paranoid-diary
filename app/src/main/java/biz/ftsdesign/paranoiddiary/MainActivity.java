@@ -71,6 +71,13 @@ public class MainActivity extends AppCompatActivity
     private SelectionTracker<Long> selectionTracker;
     private int recordsCountBeforeWrite;
 
+    /**
+     * We want to show the backup warning only once per session, so that
+     * not to annoy the user. Static because we want to keep it between
+     * the activity invocations, as long as the class is loaded.
+     */
+    private static boolean backupWarningDisplayedInThisSession = false;
+
     private final ServiceConnection connection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
@@ -204,6 +211,47 @@ public class MainActivity extends AppCompatActivity
         Log.i(this.getClass().getSimpleName(), "onRecordsUpdateFinished " + records.size());
         recordsViewAdapter.setRecords(records);
         onRecordFilterUpdated();
+        doBackupCheck();
+    }
+
+    private void doBackupCheck() {
+        if (!backupWarningDisplayedInThisSession) {
+            if (dataStorageService.isPasswordSet()) {
+                Record latestRecord = dataStorageService.getLastRecord();
+                if (latestRecord != null) {
+                    SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+                    int days = Integer.parseInt(sharedPreferences.getString(getString(R.string.pref_backup_reminder_days), "0"));
+                    if (days > 0) {
+                        long lastBackupTimestamp = sharedPreferences.getLong(getString(R.string.pref_key_last_backup_time), 0);
+                        long interval = days * 24 * 60 * 60 * 1000L;
+                        if (latestRecord.getTimeCreated() > lastBackupTimestamp && lastBackupTimestamp < System.currentTimeMillis() - interval) {
+                            backupWarningDisplayedInThisSession = true;
+                            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                            builder.setTitle(getString(R.string.backup_warning_title));
+                            builder.setIcon(R.drawable.ic_action_warning);
+                            builder.setMessage(getString(R.string.backup_warning_text, days));
+                            builder.setPositiveButton(getString(R.string.do_backup_now),
+                                    (dialog, id) -> {
+                                        Bundle b = new Bundle();
+                                        b.putInt(SettingsActivity.KEY_ACTION_ON_START, SettingsActivity.ACTION_BACKUP);
+                                        Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+                                        intent.putExtras(b);
+                                        startActivity(intent);
+                                        dialog.cancel();
+                                    });
+                            builder.setNeutralButton(getString(R.string.dismiss),
+                                    (dialog, id) -> dialog.dismiss());
+                            builder.setNegativeButton(getString(R.string.disable_backup_warning),
+                                    (dialog, id) -> {
+                                        sharedPreferences.edit().putString(getString(R.string.pref_backup_reminder_days), "0").apply();
+                                        dialog.dismiss();
+                                    });
+                            builder.create().show();
+                        }
+                    }
+                }
+            }
+        }
     }
 
     @Override

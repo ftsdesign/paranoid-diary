@@ -213,4 +213,8 @@ public class SettingsActivity extends AppCompatActivity implements
         DialogFragment dialog = new ExportZipDialogFragment();
         dialog.show(getSupportFragmentManager(), TAG_EXPORT_ZIP_DIALOG_FRAGMENT);
     }
+
+    public void doBackupRestore() {
+        // TODO
+    }
 }

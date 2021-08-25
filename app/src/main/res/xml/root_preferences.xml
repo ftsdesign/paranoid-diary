@@ -58,6 +58,10 @@
             app:key="@string/pref_key_backup"
             app:summary="@string/pref_backup_summary"/>
 
+        <Preference app:title="@string/pref_backup_restore"
+            app:key="@string/pref_key_backup_restore"
+            app:summary="@string/pref_backup_restore_summary"/>
+
         <ListPreference
             app:defaultValue="0"
             app:entries="@array/backup_reminder_entries"

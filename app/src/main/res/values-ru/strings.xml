@@ -110,4 +110,6 @@
     <string name="backup_warning_text">Вы не делали резервную копию дольше чем %d дней</string>
     <string name="do_backup_now">Сделать сейчас</string>
     <string name="dismiss">Закрыть</string>
+    <string name="pref_backup_restore">Восстановить из резервной копии</string>
+    <string name="pref_backup_restore_summary">Восстановить дневник из zip файла</string>
 </resources>

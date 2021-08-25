@@ -42,6 +42,14 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             });
         }
 
+        Preference backupRestoreButton = getPreferenceManager().findPreference(getString(R.string.pref_key_backup_restore));
+        if (backupRestoreButton != null) {
+            backupRestoreButton.setOnPreferenceClickListener(preference -> {
+                settingsActivity.doBackupRestore();
+                return true;
+            });
+        }
+
         Preference changePasswordButton = getPreferenceManager().findPreference(getString(R.string.pref_key_change_password));
         if (changePasswordButton != null) {
             changePasswordButton.setOnPreferenceClickListener(preference -> {

@@ -2,6 +2,7 @@
     <!-- These values are used as keys, do not translate -->
     <string name="pref_theme" translatable="false">theme</string>
     <string name="pref_key_backup" translatable="false">backup</string>
+    <string name="pref_key_backup_restore" translatable="false">backup_restore</string>
     <string name="pref_key_delete_all_data" translatable="false">delete_all_data</string>
     <string name="pref_key_geotagging_enabled" translatable="false">pref_key_geotagging_enabled</string>
     <string name="pref_key_last_backup_time" translatable="false">pref_key_last_backup_time</string>
@@ -119,4 +120,6 @@
     <string name="disable_backup_warning">Disable this warning</string>
     <string name="dismiss">Dismiss</string>
     <string name="backup_warning_text">You didn\'t do backup for longer than %d days</string>
+    <string name="pref_backup_restore">Restore from backup</string>
+    <string name="pref_backup_restore_summary">Restore the whole diary from a previously saved zip file</string>
 </resources>

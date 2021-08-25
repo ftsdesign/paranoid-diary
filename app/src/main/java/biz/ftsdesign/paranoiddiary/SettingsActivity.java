@@ -11,6 +11,8 @@ import android.os.IBinder;
 import android.util.Log;
 import android.view.MenuItem;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
@@ -44,6 +46,7 @@ public class SettingsActivity extends AppCompatActivity implements
     public static final int ACTION_BACKUP = 1;
     private static final String TAG_EXPORT_ZIP_DIALOG_FRAGMENT = "ExportZipDialogFragment";
     private DataStorageService dataStorageService;
+    private ActivityResultLauncher<String> activityResultLauncher;
 
     private final ServiceConnection connection = new ServiceConnection() {
         @Override
@@ -70,6 +73,9 @@ public class SettingsActivity extends AppCompatActivity implements
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+
+        activityResultLauncher =
+                registerForActivityResult(new ActivityResultContracts.GetContent(), this::handleBackupRestoreFileSelected);
     }
 
     @Override
@@ -215,6 +221,18 @@ public class SettingsActivity extends AppCompatActivity implements
     }
 
     public void doBackupRestore() {
+        // TODO
+        /*
+        1. Choose zip file
+        2. Ask password
+        3. Import internally
+        4. Confirm the whole diary will be overwritten or appended
+         */
+        // TODO Can we have custom title here?
+        activityResultLauncher.launch(MIME_ZIP);
+    }
+
+    private void handleBackupRestoreFileSelected(Uri result) {
         // TODO
     }
 }

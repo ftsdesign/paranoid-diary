@@ -23,7 +23,9 @@ import androidx.core.content.FileProvider;
 import androidx.fragment.app.DialogFragment;
 import androidx.preference.PreferenceManager;
 
+import net.lingala.zip4j.io.inputstream.ZipInputStream;
 import net.lingala.zip4j.io.outputstream.ZipOutputStream;
+import net.lingala.zip4j.model.LocalFileHeader;
 import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.model.enums.EncryptionMethod;
 
@@ -31,6 +33,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.GeneralSecurityException;
 import java.util.Date;
 import java.util.List;
@@ -240,7 +243,7 @@ public class SettingsActivity extends AppCompatActivity implements
         builder.setPositiveButton(R.string.open_backup_file, (dialog, which) -> {
             String password = input.getText().toString().trim();
             if (result != null && password.length() > 0) {
-                doOpenBackupZip(result, input.getText().toString());
+                doOpenBackupZip(result, password.toCharArray());
             }
         });
         builder.setNegativeButton(getString(R.string.cancel), (dialog, which) -> dialog.cancel());
@@ -248,10 +251,23 @@ public class SettingsActivity extends AppCompatActivity implements
         builder.show();
     }
 
-    private void doOpenBackupZip(@NonNull Uri zipFileUri, @NonNull String password) {
+    private void doOpenBackupZip(@NonNull Uri zipFileUri, @NonNull char[] password) {
         /*
         3. Import internally
         4. Confirm the whole diary will be overwritten or appended
          */
+        try {
+            InputStream uriInputStream = this.getContentResolver().openInputStream(zipFileUri);
+            ZipInputStream zis = new ZipInputStream(uriInputStream, password);
+            LocalFileHeader lfh = zis.getNextEntry();
+            if (lfh == null) {
+                throw new IOException("Backup zip file is empty");
+            }
+            Util.toastLong(this, lfh.getFileName() + " " + lfh.getUncompressedSize());
+            // TODO Continue from here
+        } catch (IOException e) {
+            Log.e(this.getClass().getSimpleName(), "Can't open backup zip file", e);
+        }
+
     }
 }

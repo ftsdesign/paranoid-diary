@@ -45,7 +45,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         Preference backupRestoreButton = getPreferenceManager().findPreference(getString(R.string.pref_key_backup_restore));
         if (backupRestoreButton != null) {
             backupRestoreButton.setOnPreferenceClickListener(preference -> {
-                settingsActivity.doBackupRestore();
+                settingsActivity.chooseBackupFileToRestore();
                 return true;
             });
         }

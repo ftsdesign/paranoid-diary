@@ -8,12 +8,16 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.text.InputType;
 import android.util.Log;
 import android.view.MenuItem;
+import android.widget.EditText;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.DialogFragment;
@@ -220,19 +224,34 @@ public class SettingsActivity extends AppCompatActivity implements
         dialog.show(getSupportFragmentManager(), TAG_EXPORT_ZIP_DIALOG_FRAGMENT);
     }
 
-    public void doBackupRestore() {
-        // TODO
-        /*
-        1. Choose zip file
-        2. Ask password
-        3. Import internally
-        4. Confirm the whole diary will be overwritten or appended
-         */
+    void chooseBackupFileToRestore() {
         // TODO Can we have custom title here?
         activityResultLauncher.launch(MIME_ZIP);
     }
 
     private void handleBackupRestoreFileSelected(Uri result) {
-        // TODO
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(getString(R.string.enter_password));
+
+        final EditText input = new EditText(this);
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        builder.setView(input);
+
+        builder.setPositiveButton(R.string.open_backup_file, (dialog, which) -> {
+            String password = input.getText().toString().trim();
+            if (result != null && password.length() > 0) {
+                doOpenBackupZip(result, input.getText().toString());
+            }
+        });
+        builder.setNegativeButton(getString(R.string.cancel), (dialog, which) -> dialog.cancel());
+
+        builder.show();
+    }
+
+    private void doOpenBackupZip(@NonNull Uri zipFileUri, @NonNull String password) {
+        /*
+        3. Import internally
+        4. Confirm the whole diary will be overwritten or appended
+         */
     }
 }

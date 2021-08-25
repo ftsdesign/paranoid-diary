@@ -122,4 +122,5 @@
     <string name="backup_warning_text">You didn\'t do backup for longer than %d days</string>
     <string name="pref_backup_restore">Restore from backup</string>
     <string name="pref_backup_restore_summary">Restore the whole diary from a previously saved zip file</string>
+    <string name="open_backup_file">Open backup file</string>
 </resources>

@@ -26,8 +26,8 @@ android {
         // Remember to update release-notes-history.md
         minSdkVersion 19
         targetSdkVersion 30
-        versionCode 13
-        versionName "1.10"
+        versionCode 14
+        versionName "1.10.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary true
     }

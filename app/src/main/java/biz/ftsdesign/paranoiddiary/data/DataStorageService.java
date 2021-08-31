@@ -65,6 +65,9 @@ public class DataStorageService extends Service implements PasswordListener {
         return record;
     }
 
+    /**
+     * Updates the record and its tags mappings in the database and cache. Tags must already exist.
+     */
     public synchronized void updateRecordAndTags(@NonNull Record record) throws GeneralSecurityException, DataException {
         if (crypto == null)
             throw new GeneralSecurityException("No password");
@@ -72,6 +75,20 @@ public class DataStorageService extends Service implements PasswordListener {
         record.setTimeUpdated(System.currentTimeMillis());
         dbHelper.updateTextAndTimestamp(record, crypto);
         dbHelper.updateRecordTagMappings(record);
+        updateRecordTagsCache(record);
+    }
+
+    private void updateRecordTagsCache(@NonNull Record record) {
+        List<Long> tagIds = recordIdToTagIds.get(record.getId());
+        if (tagIds == null) {
+            tagIds = new LinkedList<>();
+            recordIdToTagIds.put(record.getId(), tagIds);
+        } else {
+            tagIds.clear();
+        }
+        for (Tag tag : record.getTags()) {
+            tagIds.add(tag.getId());
+        }
     }
 
     @NonNull
@@ -403,7 +420,7 @@ public class DataStorageService extends Service implements PasswordListener {
             try {
                 final List<Tag> allTags = dbHelper.getAllTags(crypto);
                 for (Tag tag : allTags) {
-                    storeTagInternal(tag);
+                    addToTagsCache(tag);
                 }
                 reloadRecordTagMappings();
                 allTagsLoaded = true;
@@ -418,24 +435,17 @@ public class DataStorageService extends Service implements PasswordListener {
     @NonNull
     public synchronized Tag getOrCreateTagByName(@NonNull String tagString) throws GeneralSecurityException {
         ensureAllTagsLoaded();
-        Tag tag = tagStringToTag.get(tagString);
-        if (tag == null) {
-            tag = createNewTag(tagString);
-        }
-        return tag;
-    }
 
-    @NonNull
-    private synchronized Tag createNewTag(@NonNull String tagString) throws GeneralSecurityException {
-        Tag existingTagWithSameName = tagStringToTag.get(tagString);
+        final Tag existingTagWithSameName = tagStringToTag.get(tagString);
         if (existingTagWithSameName != null)
             return existingTagWithSameName;
-        Tag savedTag = dbHelper.create(tagString, crypto);
-        storeTagInternal(savedTag);
-        return savedTag;
+
+        final Tag newTag = dbHelper.create(tagString, crypto);
+        addToTagsCache(newTag);
+        return newTag;
     }
 
-    private synchronized void storeTagInternal(@NonNull final Tag tag) {
+    private synchronized void addToTagsCache(@NonNull final Tag tag) {
         if (tagStringToTag.containsKey(tag.getName())) {
             throw new IllegalArgumentException("Duplicate tag name: " + tagStringToTag.get(tag.getName()) + " and " + tag);
         }
@@ -471,5 +481,40 @@ public class DataStorageService extends Service implements PasswordListener {
             return;
         clearTags();
         dbHelper.recreateDb();
+    }
+
+    public enum BackupRestoreMode {
+        REPLACE, ADD
+    }
+
+    public int restoreBackup(@NonNull List<Record> records, @NonNull BackupRestoreMode backupRestoreMode) {
+        Log.i(this.getClass().getSimpleName(), "Restoring " + records.size() + " records from backup, mode " + backupRestoreMode);
+        dbHelper.beginTransaction();
+        try {
+            if (backupRestoreMode == BackupRestoreMode.REPLACE) {
+                dbHelper.deleteAll();
+            }
+
+            for (Record incomingRecord : records) {
+                Record createdRecord = dbHelper.create(incomingRecord, crypto);
+
+                for (Tag incomingTag : incomingRecord.getTags()) {
+                    Tag existingTag = getOrCreateTagByName(incomingTag.getName());
+                    createdRecord.getTags().add(existingTag);
+                }
+                dbHelper.updateRecordTagMappings(createdRecord);
+            }
+
+            reloadRecordTagMappings();
+            dbHelper.setTransactionSuccessful();
+            return records.size();
+
+        } catch (DataException|GeneralSecurityException e) {
+            Log.e(this.getClass().getSimpleName(), "Cannot restore from backup, rolling back", e);
+            return 0;
+
+        } finally {
+            dbHelper.endTransaction();
+        }
     }
 }

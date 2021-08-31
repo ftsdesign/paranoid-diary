@@ -5,6 +5,12 @@ import androidx.annotation.NonNull;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -18,6 +24,12 @@ import biz.ftsdesign.paranoiddiary.model.Record;
 import biz.ftsdesign.paranoiddiary.model.Tag;
 
 import static biz.ftsdesign.paranoiddiary.Formats.TIMESTAMP_FORMAT;
+
+import net.lingala.zip4j.io.inputstream.ZipInputStream;
+import net.lingala.zip4j.io.outputstream.ZipOutputStream;
+import net.lingala.zip4j.model.LocalFileHeader;
+import net.lingala.zip4j.model.ZipParameters;
+import net.lingala.zip4j.model.enums.EncryptionMethod;
 
 public class DataUtils {
     public static final String MIME_ZIP = "application/zip";
@@ -51,6 +63,13 @@ public class DataUtils {
         }
 
         return out;
+    }
+
+    @NonNull
+    public static List<Record> fromJson(@NonNull byte[] jsonBytes) {
+        Gson gson = new Gson();
+        Record[] data = gson.fromJson(new InputStreamReader(new ByteArrayInputStream(jsonBytes)), Record[].class);
+        return Arrays.asList(data);
     }
 
     public enum BackupFormat {
@@ -90,5 +109,45 @@ public class DataUtils {
             sb.append(DataUtils.toString(record));
         }
         return sb.toString();
+    }
+
+    @NonNull
+    public static List<Record> getRecordsFromBackupZip(@NonNull InputStream inputStreamFromZipFile, @NonNull char[] password) throws IOException {
+        try (ZipInputStream zis = new ZipInputStream(inputStreamFromZipFile, password)) {
+            LocalFileHeader lfh = zis.getNextEntry();
+            if (lfh == null) {
+                throw new IOException("Backup zip file is empty");
+            }
+            int bytesExpected = (int) lfh.getUncompressedSize();
+
+            int readLen;
+            byte[] readBuffer = new byte[4096];
+
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            while ((readLen = zis.read(readBuffer)) != -1) {
+                baos.write(readBuffer, 0, readLen);
+            }
+
+            byte[] payload = baos.toByteArray();
+            if (payload.length != bytesExpected) {
+                throw new IOException("Bytes read " + payload.length + " != expected size " + bytesExpected);
+            }
+            return DataUtils.fromJson(payload);
+        }
+    }
+
+    public static byte[] createEncryptedZip(byte[] recordsData, String filename, String password) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ZipOutputStream zos = new ZipOutputStream(baos, password.toCharArray());
+        ZipParameters zipParameters = new ZipParameters();
+        zipParameters.setEncryptFiles(true);
+        zipParameters.setEncryptionMethod(EncryptionMethod.ZIP_STANDARD);
+        zipParameters.setFileNameInZip(filename);
+        zipParameters.setEntrySize(recordsData.length);
+        zos.putNextEntry(zipParameters);
+        zos.write(recordsData);
+        zos.closeEntry();
+        zos.close();
+        return baos.toByteArray();
     }
 }

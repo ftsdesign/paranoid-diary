@@ -123,4 +123,9 @@
     <string name="pref_backup_restore">Restore from backup</string>
     <string name="pref_backup_restore_summary">Restore the whole diary from a previously saved zip file</string>
     <string name="open_backup_file">Open backup file</string>
+    <string name="backup_restore_method_replace">Replace</string>
+    <string name="backup_restore_method_add">Add</string>
+    <string name="choose_backup_restore_method">Choose backup restore method</string>
+    <string name="choose_backup_restore_method_msg">Your diary already has %d records. What to do with the records being restored?</string>
+    <string name="enter_backup_password">Backup file password</string>
 </resources>

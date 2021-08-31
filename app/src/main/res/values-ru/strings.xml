@@ -113,4 +113,9 @@
     <string name="pref_backup_restore">Восстановить из резервной копии</string>
     <string name="pref_backup_restore_summary">Восстановить дневник из zip файла</string>
     <string name="open_backup_file">Открыть файл резервной копии</string>
+    <string name="backup_restore_method_replace">Заменить</string>
+    <string name="backup_restore_method_add">Добавить</string>
+    <string name="choose_backup_restore_method">Как восстановить резервную копию?</string>
+    <string name="choose_backup_restore_method_msg">В вашем дневнике уже есть %d записей. Что сделать с записями из резервной копии?</string>
+    <string name="enter_backup_password">Пароль файла резервной копии</string>
 </resources>

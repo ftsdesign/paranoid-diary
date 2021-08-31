@@ -23,18 +23,11 @@ import androidx.core.content.FileProvider;
 import androidx.fragment.app.DialogFragment;
 import androidx.preference.PreferenceManager;
 
-import net.lingala.zip4j.io.inputstream.ZipInputStream;
-import net.lingala.zip4j.io.outputstream.ZipOutputStream;
-import net.lingala.zip4j.model.LocalFileHeader;
-import net.lingala.zip4j.model.ZipParameters;
-import net.lingala.zip4j.model.enums.EncryptionMethod;
-
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.security.GeneralSecurityException;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -82,7 +75,7 @@ public class SettingsActivity extends AppCompatActivity implements
         }
 
         activityResultLauncher =
-                registerForActivityResult(new ActivityResultContracts.GetContent(), this::handleBackupRestoreFileSelected);
+                registerForActivityResult(new ActivityResultContracts.GetContent(), this::onBackupRestoreFileSelected);
     }
 
     @Override
@@ -150,7 +143,7 @@ public class SettingsActivity extends AppCompatActivity implements
                     filename = "ParanoidDiary" + timestampSuffix + ".txt";
                     break;
             }
-            byte[] encryptedZipData = createEncryptedZip(recordsData, filename, password);
+            byte[] encryptedZipData = DataUtils.createEncryptedZip(recordsData, filename, password);
             File cacheDir = getFilesDir();
             File f = new File(cacheDir, "ParanoidDiary" + timestampSuffix + ".zip");
             Log.i(this.getClass().getCanonicalName(), f.getAbsolutePath());
@@ -178,21 +171,6 @@ public class SettingsActivity extends AppCompatActivity implements
         } catch (Exception e) {
             Log.e(this.getClass().getCanonicalName(), e.getMessage(), e);
         }
-    }
-
-    private byte[] createEncryptedZip(byte[] recordsData, String filename, String password) throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ZipOutputStream zos = new ZipOutputStream(baos, password.toCharArray());
-        ZipParameters zipParameters = new ZipParameters();
-        zipParameters.setEncryptFiles(true);
-        zipParameters.setEncryptionMethod(EncryptionMethod.ZIP_STANDARD);
-        zipParameters.setFileNameInZip(filename);
-        zipParameters.setEntrySize(recordsData.length);
-        zos.putNextEntry(zipParameters);
-        zos.write(recordsData);
-        zos.closeEntry();
-        zos.close();
-        return baos.toByteArray();
     }
 
     @Override
@@ -228,46 +206,64 @@ public class SettingsActivity extends AppCompatActivity implements
     }
 
     void chooseBackupFileToRestore() {
-        // TODO Can we have custom title here?
         activityResultLauncher.launch(MIME_ZIP);
     }
 
-    private void handleBackupRestoreFileSelected(Uri result) {
+    private void onBackupRestoreFileSelected(final Uri result) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(getString(R.string.enter_password));
+        builder.setTitle(getString(R.string.enter_backup_password));
 
         final EditText input = new EditText(this);
         input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS | InputType.TYPE_TEXT_VARIATION_PASSWORD);
         builder.setView(input);
 
-        builder.setPositiveButton(R.string.open_backup_file, (dialog, which) -> {
-            String password = input.getText().toString().trim();
-            if (result != null && password.length() > 0) {
-                doOpenBackupZip(result, password.toCharArray());
-            }
-        });
+        builder.setPositiveButton(R.string.open_backup_file,
+                (dialog, which) -> onBackupFileOpened(result, input.getText().toString().trim().toCharArray()));
         builder.setNegativeButton(getString(R.string.cancel), (dialog, which) -> dialog.cancel());
 
         builder.show();
     }
 
-    private void doOpenBackupZip(@NonNull Uri zipFileUri, @NonNull char[] password) {
-        /*
-        3. Import internally
-        4. Confirm the whole diary will be overwritten or appended
-         */
-        try {
-            InputStream uriInputStream = this.getContentResolver().openInputStream(zipFileUri);
-            ZipInputStream zis = new ZipInputStream(uriInputStream, password);
-            LocalFileHeader lfh = zis.getNextEntry();
-            if (lfh == null) {
-                throw new IOException("Backup zip file is empty");
-            }
-            Util.toastLong(this, lfh.getFileName() + " " + lfh.getUncompressedSize());
-            // TODO Continue from here
-        } catch (IOException e) {
-            Log.e(this.getClass().getSimpleName(), "Can't open backup zip file", e);
-        }
+    private void onBackupFileOpened(final Uri result, final char[] password) {
+        if (result != null && password.length > 0) {
+            Log.i(this.getClass().getSimpleName(), "Backup file selected: " + result);
+            final List<Record> records = getRecordsFromBackupZip(result, password);
+            if (!records.isEmpty()) {
+                if (dataStorageService.getRecordsCount() > 0) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setTitle(getString(R.string.choose_backup_restore_method));
+                    builder.setMessage(getString(R.string.choose_backup_restore_method_msg, dataStorageService.getRecordsCount()));
+                    builder.setPositiveButton(getString(R.string.backup_restore_method_replace),
+                            (dialog, which) -> doRestoreFromBackup(records, DataStorageService.BackupRestoreMode.REPLACE));
+                    builder.setNeutralButton(getString(R.string.backup_restore_method_add),
+                            (dialog, which) -> doRestoreFromBackup(records, DataStorageService.BackupRestoreMode.ADD));
+                    builder.show();
 
+                } else {
+                    doRestoreFromBackup(records, DataStorageService.BackupRestoreMode.ADD);
+                }
+
+            }
+        }
     }
+
+    private void doRestoreFromBackup(@NonNull List<Record> records, @NonNull DataStorageService.BackupRestoreMode restoreMode) {
+        int restoredRecordsCount = dataStorageService.restoreBackup(records, restoreMode);
+        Util.toastLong(this, "Restored " + restoredRecordsCount + " records");
+    }
+
+    @NonNull
+    private List<Record> getRecordsFromBackupZip(@NonNull Uri zipFileUri, @NonNull char[] password) {
+        List<Record> records = Collections.emptyList();
+        try  {
+            records = DataUtils.getRecordsFromBackupZip(getContentResolver().openInputStream(zipFileUri), password);
+            Log.i(this.getClass().getSimpleName(), "Records loaded from backup file: " + records.size());
+
+        } catch (IOException e) {
+            Util.toastLong(this, "Can't open backup zip file: " + e.getMessage());
+            Log.e(this.getClass().getSimpleName(), "Can't open backup zip file: " + e.getMessage(), e);
+        }
+        return records;
+    }
+
 }

@@ -23,7 +23,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 
 import biz.ftsdesign.paranoiddiary.model.GeoTag;
 import biz.ftsdesign.paranoiddiary.model.Record;
@@ -65,6 +64,12 @@ class DBHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + PwdCheckTable.TABLE_NAME);
     }
 
+    void deleteAll() {
+        db.delete(RecordTable.TABLE_NAME, null, null);
+        db.delete(TagTable.TABLE_NAME, null, null);
+        db.delete(RecordTagTable.TABLE_NAME, null, null);
+    }
+
     @Override
     public void onCreate(SQLiteDatabase db) {
         Log.i(this.getClass().getSimpleName(), "Initializing the database...");
@@ -84,6 +89,11 @@ class DBHelper extends SQLiteOpenHelper {
 
     }
 
+    /**
+     * Creates a new record in the database. This does not save the tags.
+     * @param record Record to save
+     * @return Independent copy of a saved record with id populated
+     */
     @NonNull
     Record create(@NonNull final Record record, @NonNull final CryptoModule crypto) throws GeneralSecurityException, DataException {
         ContentValues values = new ContentValues();
@@ -151,7 +161,10 @@ class DBHelper extends SQLiteOpenHelper {
         values.put(RecordTagTable.COLUMN_RECORD_ID, recordId);
         values.put(RecordTagTable.COLUMN_TAG_ID, tagId);
         // Don't want to check if the composite primary key already exists
-        db.insertWithOnConflict(RecordTagTable.TABLE_NAME, null, values, SQLiteDatabase.CONFLICT_IGNORE);
+        long rowId = db.insertWithOnConflict(RecordTagTable.TABLE_NAME, null, values, SQLiteDatabase.CONFLICT_FAIL);
+        if (rowId == -1) {
+            Log.e(this.getClass().getSimpleName(), "Cannot update record-tag mapping");
+        }
     }
 
     void unsetTagForRecord(long recordId, long tagId) {
@@ -162,11 +175,10 @@ class DBHelper extends SQLiteOpenHelper {
 
     void updateRecordTagMappings(@NonNull final Record record) {
         clearTagsForRecord(record.getId());
-        final Set<Tag> tags = record.getTags();
-        for (Tag tag : tags) {
+        for (Tag tag : record.getTags()) {
             setTagForRecord(record, tag);
         }
-        Log.i(this.getClass().getSimpleName(), "Updated " + tags.size() + " tags for record #" + record.getId());
+        Log.i(this.getClass().getSimpleName(), "Updated " + record.getTags().size() + " tags for record #" + record.getId());
     }
 
     @NonNull
@@ -329,7 +341,7 @@ class DBHelper extends SQLiteOpenHelper {
         String selection = RecordTagTable.COLUMN_RECORD_ID + " = ?";
         String[] selectionArgs = {String.valueOf(recordId)};
         int tagsDeleted = db.delete(RecordTagTable.TABLE_NAME, selection, selectionArgs);
-        Log.i(this.getClass().getSimpleName(), "Deleted all " + tagsDeleted + " tags for record #" + recordId);
+        Log.i(this.getClass().getSimpleName(), "Deleted all " + tagsDeleted + " existing tag mappings for record #" + recordId);
     }
 
     boolean isPasswordCorrect(@NonNull final CryptoModule crypto) {
@@ -479,5 +491,17 @@ class DBHelper extends SQLiteOpenHelper {
 
     public long getRecordsCount() {
         return DatabaseUtils.queryNumEntries(db, RecordTable.TABLE_NAME);
+    }
+
+    void beginTransaction() {
+        db.beginTransaction();
+    }
+
+    void setTransactionSuccessful() {
+        db.setTransactionSuccessful();
+    }
+
+    void endTransaction() {
+        db.endTransaction();
     }
 }

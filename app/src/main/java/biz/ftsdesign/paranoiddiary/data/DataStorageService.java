@@ -14,9 +14,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -496,9 +498,12 @@ public class DataStorageService extends Service implements PasswordListener {
             }
 
             for (Record incomingRecord : records) {
+                Set<Tag> incomingTagsCopy = new HashSet<>(incomingRecord.getTags());
+                incomingRecord.getTags().clear();
+
                 Record createdRecord = dbHelper.create(incomingRecord, crypto);
 
-                for (Tag incomingTag : incomingRecord.getTags()) {
+                for (Tag incomingTag : incomingTagsCopy) {
                     Tag existingTag = getOrCreateTagByName(incomingTag.getName());
                     createdRecord.getTags().add(existingTag);
                 }

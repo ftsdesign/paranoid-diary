@@ -160,11 +160,8 @@ class DBHelper extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(RecordTagTable.COLUMN_RECORD_ID, recordId);
         values.put(RecordTagTable.COLUMN_TAG_ID, tagId);
-        // Don't want to check if the composite primary key already exists
-        long rowId = db.insertWithOnConflict(RecordTagTable.TABLE_NAME, null, values, SQLiteDatabase.CONFLICT_FAIL);
-        if (rowId == -1) {
-            Log.e(this.getClass().getSimpleName(), "Cannot update record-tag mapping");
-        }
+        // If the primary key (recordId+tagId) combination already exists, ignore and do nothing
+        db.insertWithOnConflict(RecordTagTable.TABLE_NAME, null, values, SQLiteDatabase.CONFLICT_IGNORE);
     }
 
     void unsetTagForRecord(long recordId, long tagId) {

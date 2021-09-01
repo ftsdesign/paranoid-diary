@@ -460,7 +460,7 @@ class DBHelper extends SQLiteOpenHelper {
         return false;
     }
 
-    void savePwdCheck(CryptoModule crypto) throws GeneralSecurityException {
+    void savePwdCheck(@NonNull CryptoModule crypto) throws GeneralSecurityException {
         Random random = new SecureRandom();
         byte[] randomBytes = new byte[PWD_CHECK_LENGTH];
         random.nextBytes(randomBytes);

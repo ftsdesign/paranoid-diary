@@ -5,6 +5,9 @@ import android.provider.BaseColumns;
 class PwdCheckTable implements BaseColumns {
     static final String TABLE_NAME = "PwdCheck";
     static final String COLUMN_KEY = "Key";
+    /**
+     * This is the key of the only record in this table.
+     */
     static final int KEY = 1;
     static final String COLUMN_VALUE = "Value";
 

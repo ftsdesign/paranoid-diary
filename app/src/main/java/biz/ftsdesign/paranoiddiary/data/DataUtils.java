@@ -49,7 +49,11 @@ public class DataUtils {
         return tagNames;
     }
 
-    static byte[] assemble(byte[]... byteArrays) {
+    /**
+     * Combines multiple byte arrays into one.
+     */
+    @NonNull
+    static byte[] assemble(@NonNull byte[]... byteArrays) {
         int len = 0;
         for (byte[] byteArray : byteArrays) {
             len += byteArray.length;

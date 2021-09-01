@@ -445,7 +445,7 @@ public class MainActivity extends AppCompatActivity
 
     private void doTagRecords() {
         if (selectionTracker.hasSelection()) {
-            Map<Tag, MultiSelectionState> tagToSelectionState = getTagsSelectionState(getSelectedRecords());
+            final Map<Tag, MultiSelectionState> tagToSelectionState = getTagsSelectionState(getSelectedRecords());
             final List<Long> selectedRecordIds = getSelectedRecordIds();
             String header = getString(R.string.records_affected, selectedRecordIds.size());
             TagsDialogFragment dialog = new TagsDialogFragment(dataStorageService, tagToSelectionState, header,
@@ -456,7 +456,7 @@ public class MainActivity extends AppCompatActivity
                                 final List<Long> selectedRecordIds = getSelectedRecordIds();
                                 Log.i(this.getClass().getSimpleName(), "For " + selectedRecordIds.size() + " selected records, set " + tagsToSetIds.size() + ", unset " + tagsToUnsetIds.size() + " tags");
                                 dataStorageService.bulkModifyTags(selectedRecordIds, tagsToSetIds, tagsToUnsetIds);
-                                recordsViewAdapter.updateRecords(selectedRecordIds);
+                                recordsViewAdapter.reloadRecordsFromDb(selectedRecordIds);
                             } catch (GeneralSecurityException e) {
                                 Util.toastException(MainActivity.this, e);
                             }
@@ -576,7 +576,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private @NonNull List<Record> getSelectedRecords() {
-        List<Record> records = new LinkedList<>();
+        final List<Record> records = new LinkedList<>();
         for (long id : selectionTracker.getSelection()) {
             Record record = recordsViewAdapter.getRecordById(id);
             if (record != null) {

@@ -53,6 +53,9 @@ public class DataStorageService extends Service implements PasswordListener {
         return binder;
     }
 
+    /**
+     * Loads a record from the database, together with the associated tags
+     */
     @Nullable
     public synchronized Record getRecord(long recordId) {
         if (crypto == null)
@@ -60,7 +63,7 @@ public class DataStorageService extends Service implements PasswordListener {
         Log.i(this.getClass().getSimpleName(), "getRecord " + recordId);
         final Record record = dbHelper.getRecord(recordId, crypto);
         if (record != null) {
-            populateRecordsWithTags(Collections.singletonList(record));
+            populateRecordWithTags(record);
         } else {
             Log.w(this.getClass().getSimpleName(), "Record not found #" + recordId);
         }
@@ -117,13 +120,16 @@ public class DataStorageService extends Service implements PasswordListener {
         return records;
     }
 
-    private void reloadRecordTagMappings() {
+    private void reloadRecordTagMappingsFromDb() {
         recordIdToTagIds = dbHelper.getAllRecordTagMappings();
     }
 
+    /**
+     * Populates the selected records with tags as per recordIdToTagIds
+     */
     private void populateRecordsWithTags(@NonNull final List<Record> records) {
         ensureAllTagsLoaded();
-        reloadRecordTagMappings();
+        reloadRecordTagMappingsFromDb();
         Map<Long,Record> idToRecord = new HashMap<>();
         for (Record record : records) {
             idToRecord.put(record.getId(), record);
@@ -141,6 +147,28 @@ public class DataStorageService extends Service implements PasswordListener {
             }
         }
         Log.i(this.getClass().getSimpleName(), "Populated " + records.size() + " records with " + tagsCount + " tags");
+    }
+
+    /**
+     * Reloads recordIdToTagIds from the database and
+     * populates the record with the tags from it.
+     * Any previously existing tags are cleared.
+     */
+    private void populateRecordWithTags(@NonNull final Record record) {
+        ensureAllTagsLoaded();
+        reloadRecordTagMappingsFromDb();
+
+        record.getTags().clear();
+        final List<Long> tagIds = recordIdToTagIds.get(record.getId());
+        if (tagIds != null) {
+            for (long tagId : tagIds) {
+                Tag tag = getTagById(tagId);
+                if (tag != null) {
+                    record.getTags().add(tag);
+                }
+            }
+        }
+        Log.i(this.getClass().getSimpleName(), "Populated record " + record.getId() + " with " + record.getTags().size() + " tags");
     }
 
     @Nullable
@@ -164,7 +192,7 @@ public class DataStorageService extends Service implements PasswordListener {
         Log.i(this.getClass().getCanonicalName(), "delete " + recordId);
         int deletedRecords = dbHelper.deleteRecord(recordId);
         dbHelper.clearTagsForRecord(recordId);
-        reloadRecordTagMappings();
+        reloadRecordTagMappingsFromDb();
         return deletedRecords;
     }
 
@@ -196,7 +224,7 @@ public class DataStorageService extends Service implements PasswordListener {
 
     @SuppressWarnings("unused") // Reserved for future use
     private boolean safeDeleteTag(@NonNull Tag tag) {
-        reloadRecordTagMappings();
+        reloadRecordTagMappingsFromDb();
         final int mappings = countMappings(tag);
         if (mappings == 0) {
             dbHelper.deleteTag(tag.getId());
@@ -294,7 +322,7 @@ public class DataStorageService extends Service implements PasswordListener {
     }
 
     public synchronized @NonNull Map<Long, Integer> getTagUsageCount() {
-        reloadRecordTagMappings();
+        reloadRecordTagMappingsFromDb();
 
         final Map<Long,Integer> tagIdToCount = new HashMap<>();
         for (List<Long> tagIds : recordIdToTagIds.values()) {
@@ -323,7 +351,7 @@ public class DataStorageService extends Service implements PasswordListener {
                 dbHelper.unsetTagForRecord(recordId, tagId);
             }
         }
-        reloadRecordTagMappings();
+        reloadRecordTagMappingsFromDb();
     }
 
     @Nullable
@@ -424,7 +452,7 @@ public class DataStorageService extends Service implements PasswordListener {
                 for (Tag tag : allTags) {
                     addToTagsCache(tag);
                 }
-                reloadRecordTagMappings();
+                reloadRecordTagMappingsFromDb();
                 allTagsLoaded = true;
                 Log.i(this.getClass().getSimpleName(), "Loaded tags: " + allTags.size());
 
@@ -510,7 +538,7 @@ public class DataStorageService extends Service implements PasswordListener {
                 dbHelper.updateRecordTagMappings(createdRecord);
             }
 
-            reloadRecordTagMappings();
+            reloadRecordTagMappingsFromDb();
             dbHelper.setTransactionSuccessful();
             return records.size();
 

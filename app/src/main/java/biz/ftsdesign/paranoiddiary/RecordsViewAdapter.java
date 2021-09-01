@@ -41,8 +41,8 @@ class RecordsViewAdapter extends RecyclerView.Adapter<RecordsViewAdapter.RecordV
 
     private List<Record> records;
     private List<Record> filteredRecords;
-
     private Map<Long,Record> idToRecord;
+
     private DataStorageService dataStorageService;
     private int tagColor = Color.YELLOW;
     private SelectionTracker<Long> selectionTracker;
@@ -204,14 +204,14 @@ class RecordsViewAdapter extends RecyclerView.Adapter<RecordsViewAdapter.RecordV
         setPredicate(null);
     }
 
-    void updateRecords(@NonNull List<Long> recordIds) {
+    void reloadRecordsFromDb(@NonNull List<Long> recordIds) {
         Log.i(this.getClass().getSimpleName(), "Update records " + recordIds);
         for (long recordId : recordIds) {
-            updateRecord(recordId);
+            reloadRecordFromDb(recordId);
         }
     }
 
-    private void updateRecord(final long recordId) {
+    private void reloadRecordFromDb(final long recordId) {
         Log.i(this.getClass().getSimpleName(), "Updating record #" + recordId);
         // Reload the latest changes from the database
         final Record record = dataStorageService.getRecord(recordId);
@@ -222,17 +222,20 @@ class RecordsViewAdapter extends RecyclerView.Adapter<RecordsViewAdapter.RecordV
                 Log.i(this.getClass().getSimpleName(), "Item changed at position " + position);
                 notifyItemChanged(position);
             }
+        } else {
+            Log.e(this.getClass().getSimpleName(), "Record " + recordId + " not found in the database");
         }
     }
 
     private void replaceUpdatedRecord(@NonNull Record record) {
         Util.replaceInList(record, records);
         Util.replaceInList(record, filteredRecords);
+        idToRecord.put(record.getId(), record);
     }
 
     void onNewRecordAdded() {
         clearPredicate();
-        updateRecord(records.get(0).getId());
+        reloadRecordFromDb(records.get(0).getId());
         this.notifyItemChanged(0);
     }
 

@@ -392,6 +392,10 @@ class DBHelper extends SQLiteOpenHelper {
         }
     }
 
+    /**
+     *
+     * @return Key - record ID, value - list of tag IDs.
+     */
     @NonNull
     Map<Long, List<Long>> getAllRecordTagMappings() {
         try (Cursor cursor = db.query(RecordTagTable.TABLE_NAME,

@@ -26,6 +26,7 @@ import androidx.preference.PreferenceManager;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.security.GeneralSecurityException;
 import java.util.Collections;
 import java.util.Date;
@@ -45,8 +46,10 @@ public class SettingsActivity extends AppCompatActivity implements
     public static final String KEY_ACTION_ON_START = "actionOnStart";
     public static final int ACTION_BACKUP = 1;
     private static final String TAG_EXPORT_ZIP_DIALOG_FRAGMENT = "ExportZipDialogFragment";
+    private static final String BACKUP_FILENAME_PREFIX = "ParanoidDiary";
     private DataStorageService dataStorageService;
-    private ActivityResultLauncher<String> activityResultLauncher;
+    private ActivityResultLauncher<String> backupRestoreFileSelectedLauncher;
+    private ActivityResultLauncher<String> saveZipLauncher;
 
     private final ServiceConnection connection = new ServiceConnection() {
         @Override
@@ -61,6 +64,8 @@ public class SettingsActivity extends AppCompatActivity implements
         }
     };
 
+    private byte[] encryptedZipData;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,8 +79,10 @@ public class SettingsActivity extends AppCompatActivity implements
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-        activityResultLauncher =
+        backupRestoreFileSelectedLauncher =
                 registerForActivityResult(new ActivityResultContracts.GetContent(), this::onBackupRestoreFileSelected);
+        saveZipLauncher =
+                registerForActivityResult(new ActivityResultContracts.CreateDocument(), this::onSaveZipLocationSelected);
     }
 
     @Override
@@ -125,29 +132,94 @@ public class SettingsActivity extends AppCompatActivity implements
         return dataStorageService;
     }
 
-    private void doExport(String password, DataUtils.BackupFormat backupFormat) {
+    private void doExport(@NonNull String password, @NonNull DataUtils.BackupFormat backupFormat) {
         Log.i(this.getClass().getSimpleName(), "Exporting all data as " + backupFormat);
         try {
-            String timestampSuffix = "_" + Formats.FILE_TIMESTAMP_FORMAT.format(new Date());
-            List<Record> records = dataStorageService.getAllRecords(DataUtils.DEFAULT_DIARY_ID);
-            final byte[] recordsData;
-            String filename;
-            switch (backupFormat) {
-                case JSON:
-                    recordsData = DataUtils.toJson(records).getBytes();
-                    filename = "ParanoidDiary" + timestampSuffix + ".json";
-                    break;
-                case TEXT:
-                default:
-                    recordsData = DataUtils.getRecordsAsText(records).getBytes();
-                    filename = "ParanoidDiary" + timestampSuffix + ".txt";
-                    break;
-            }
-            byte[] encryptedZipData = DataUtils.createEncryptedZip(recordsData, filename, password);
-            File cacheDir = getFilesDir();
-            File f = new File(cacheDir, "ParanoidDiary" + timestampSuffix + ".zip");
-            Log.i(this.getClass().getCanonicalName(), f.getAbsolutePath());
-            FileOutputStream fos = new FileOutputStream(f);
+            final String timestamp = "_" + Formats.FILE_TIMESTAMP_FORMAT.format(new Date());
+            final String zipFileName = BACKUP_FILENAME_PREFIX + timestamp + ".zip";
+            encryptedZipData = getEncryptedZipData(password, backupFormat, timestamp);
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle(getString(R.string.what_do_you_want_to_do_with_backup));
+
+            builder.setPositiveButton(getString(R.string.share), (dialog, which) -> doShareZip(zipFileName));
+            builder.setNegativeButton(getString(R.string.save), (dialog, which) -> doChooseSaveZipLocation(zipFileName));
+            builder.setNeutralButton(getString(R.string.cancel), (dialog, which) -> {
+                dialog.cancel();
+                encryptedZipData = null;
+            });
+
+            builder.show();
+
+        } catch (Exception e) {
+            Log.e(this.getClass().getCanonicalName(), e.getMessage(), e);
+        }
+    }
+
+    private void recordBackupTime() {
+        /*
+        On minSdkVersion 19 we cannot be sure that the backup file was actually shared and saved successfully,
+        so whenever the chooser activity was launched, we count it as a successful backup.
+         */
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        sharedPreferences.edit().putLong(getString(R.string.pref_key_last_backup_time), System.currentTimeMillis()).apply();
+        Log.i(this.getClass().getSimpleName(), "Backup time recorded");
+    }
+
+    @NonNull
+    private byte[] getEncryptedZipData(@NonNull String password, @NonNull DataUtils.BackupFormat backupFormat,
+                                       @NonNull String timestamp) throws GeneralSecurityException, IOException {
+        List<Record> records = dataStorageService.getAllRecords(DataUtils.DEFAULT_DIARY_ID);
+        final byte[] recordsData;
+        final String filename;
+        switch (backupFormat) {
+            case JSON:
+                recordsData = DataUtils.toJson(records).getBytes();
+                filename = BACKUP_FILENAME_PREFIX + timestamp + ".json";
+                break;
+            case TEXT:
+            default:
+                recordsData = DataUtils.getRecordsAsText(records).getBytes();
+                filename = BACKUP_FILENAME_PREFIX + timestamp + ".txt";
+                break;
+        }
+        return DataUtils.createEncryptedZip(recordsData, filename, password);
+    }
+
+    private void doChooseSaveZipLocation(String zipFileName) {
+        saveZipLauncher.launch(zipFileName);
+    }
+
+    private void onSaveZipLocationSelected(final Uri targetUri) {
+        if (encryptedZipData == null) {
+            Util.toastError(this, "Nothing to save");
+            Log.w(this.getClass().getSimpleName(), "encryptedZipData became null before save");
+            return;
+        }
+
+        try (OutputStream os = getContentResolver().openOutputStream(targetUri)) {
+            os.write(encryptedZipData);
+            recordBackupTime();
+
+        } catch (IOException e) {
+            Log.e(this.getClass().getSimpleName(), "Cannot write file: " + e.getMessage(), e);
+            Util.toastError(this, "Cannot write file: " + e.getMessage());
+
+        } finally {
+            encryptedZipData = null;
+        }
+    }
+
+    private void doShareZip(@NonNull String zipFileName) {
+        if (encryptedZipData == null) {
+            Util.toastError(this, "Nothing to save");
+            Log.w(this.getClass().getSimpleName(), "encryptedZipData became null before share");
+            return;
+        }
+        File cacheDir = getFilesDir();
+        File f = new File(cacheDir, zipFileName);
+        Log.i(this.getClass().getCanonicalName(), f.getAbsolutePath());
+        try (FileOutputStream fos = new FileOutputStream(f)) {
             fos.write(encryptedZipData);
             fos.close();
             Uri uri = FileProvider.getUriForFile(this, "biz.ftsdesign.paranoiddiary.provider", f);
@@ -160,16 +232,14 @@ public class SettingsActivity extends AppCompatActivity implements
             Intent shareIntent = Intent.createChooser(sendIntent, null);
             startActivity(shareIntent);
 
-            /*
-            On minSdkVersion 19 we cannot be sure that the backup file was actually shared and saved successfully,
-            so whenever the chooser activity was launched, we count it as a successful backup.
-             */
-            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-            sharedPreferences.edit().putLong(getString(R.string.pref_key_last_backup_time), System.currentTimeMillis()).apply();
-            Log.i(this.getClass().getSimpleName(), "Backup time recorded");
+            recordBackupTime();
 
-        } catch (Exception e) {
-            Log.e(this.getClass().getCanonicalName(), e.getMessage(), e);
+        } catch (IOException e) {
+            Log.e(this.getClass().getSimpleName(), "Cannot share backup file: " + e.getMessage(), e);
+            Util.toastError(this, "Cannot share backup file: " + e.getMessage());
+
+        } finally {
+            encryptedZipData = null;
         }
     }
 
@@ -206,7 +276,7 @@ public class SettingsActivity extends AppCompatActivity implements
     }
 
     void chooseBackupFileToRestore() {
-        activityResultLauncher.launch(MIME_ZIP);
+        backupRestoreFileSelectedLauncher.launch(MIME_ZIP);
     }
 
     private void onBackupRestoreFileSelected(final Uri result) {

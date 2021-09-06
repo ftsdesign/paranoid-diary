@@ -140,7 +140,8 @@ public class DataUtils {
         }
     }
 
-    public static byte[] createEncryptedZip(byte[] recordsData, String filename, String password) throws IOException {
+    @NonNull
+    public static byte[] createEncryptedZip(@NonNull byte[] recordsData, @NonNull String filename, @NonNull String password) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ZipOutputStream zos = new ZipOutputStream(baos, password.toCharArray());
         ZipParameters zipParameters = new ZipParameters();

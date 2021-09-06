@@ -118,4 +118,7 @@
     <string name="choose_backup_restore_method">Как восстановить резервную копию?</string>
     <string name="choose_backup_restore_method_msg">В вашем дневнике уже есть %d записей. Что сделать с записями из резервной копии?</string>
     <string name="enter_backup_password">Пароль файла резервной копии</string>
+    <string name="save">Сохранить</string>
+    <string name="share">Поделиться</string>
+    <string name="what_do_you_want_to_do_with_backup">Что вы хотите сделать с файлом резервной копии?</string>
 </resources>

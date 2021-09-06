@@ -128,4 +128,7 @@
     <string name="choose_backup_restore_method">Choose backup restore method</string>
     <string name="choose_backup_restore_method_msg">Your diary already has %d records. What to do with the records being restored?</string>
     <string name="enter_backup_password">Backup file password</string>
+    <string name="save">Save</string>
+    <string name="share">Share</string>
+    <string name="what_do_you_want_to_do_with_backup">What do you want to do with the backup file?</string>
 </resources>

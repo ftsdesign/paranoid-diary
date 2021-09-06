@@ -6,20 +6,6 @@
     android:padding="@dimen/dialog_padding">
 
     <TextView
-        android:id="@+id/TextView_OutputFormat"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/settings_output_format"
-        android:textSize="@dimen/base_font_size"
-        android:textStyle="bold" />
-
-    <Spinner
-        android:id="@+id/spinner_format"
-        android:entries="@array/backup_formats_array"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content" />
-
-    <TextView
         android:id="@+id/TextView_Pwd1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

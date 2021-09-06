@@ -75,7 +75,6 @@
     <string name="set_password_for_zip_file">Set password for zip file</string>
     <string name="pref_backup">Backup</string>
     <string name="pref_backup_summary">Save your whole diary in a zip file</string>
-    <string name="settings_output_format">Output format:</string>
     <string name="permissions">Permissions</string>
     <string name="enable_geotagging">Enable auto geotagging</string>
     <string name="enable_geotagging_summary">Diary records will be automatically geotagged with the current location</string>
@@ -102,10 +101,6 @@
     <string name="new_tag">New tag</string>
     <string name="action_clear_filter">Clear filter</string>
 
-    <string-array name="backup_formats_array">
-        <item>JSON</item>
-        <item>Text</item>
-    </string-array>
     <string name="pref_key_show_diary_info">show_diary_info</string>
     <string name="pref_show_diary_info">Show diary info</string>
     <string name="pref_show_diary_info_summary">Displays stats about the data in your diary</string>

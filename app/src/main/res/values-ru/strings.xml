@@ -65,7 +65,6 @@
     <string name="set_password_for_zip_file">Установите пароль для zip файла</string>
     <string name="pref_backup">Резервная копия</string>
     <string name="pref_backup_summary">Сохранить весь дневник в zip файл</string>
-    <string name="settings_output_format">Формат:</string>
     <string name="permissions">Разрешения</string>
     <string name="enable_geotagging">Разрешить авто гео метку</string>
     <string name="enable_geotagging_summary">Записи будут автоматически помечены текущим местоположением</string>
@@ -92,10 +91,6 @@
     <string name="new_tag">Новая метка</string>
     <string name="action_clear_filter">Очистить фильтр</string>
 
-    <string-array name="backup_formats_array">
-        <item>JSON</item>
-        <item>Текст</item>
-    </string-array>
     <string name="pref_key_show_diary_info">show_diary_info</string>
     <string name="pref_show_diary_info">Информация о дневнике</string>
     <string name="pref_show_diary_info_summary">Статистика о данных в дневнике</string>

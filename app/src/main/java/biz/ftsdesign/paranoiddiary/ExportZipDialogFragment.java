@@ -5,12 +5,10 @@ import android.content.Context;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -38,7 +36,6 @@ public class ExportZipDialogFragment extends DialogFragment {
         final EditText password1 = layout.findViewById(R.id.EditText_Pwd1);
         final EditText password2 = layout.findViewById(R.id.EditText_Pwd2);
         final TextView error = layout.findViewById(R.id.TextView_PwdProblem);
-        final Spinner formatSpinner = layout.findViewById(R.id.spinner_format);
         error.setText(R.string.password_cant_be_empty);
 
         TextWatcher textWatcher = new TextWatcher() {
@@ -72,19 +69,10 @@ public class ExportZipDialogFragment extends DialogFragment {
         builder.setView(layout)
                 .setPositiveButton(R.string.export, (dialog, id) -> {
                     if (listener != null) {
-                        String formatString = formatSpinner.getSelectedItem().toString();
-                        DataUtils.BackupFormat format;
-                        // Be very careful here, because formatString is localized, only JSON is spelled the same in all supported languages
-                        if (formatString.equalsIgnoreCase(DataUtils.BackupFormat.JSON.name())) {
-                            format = DataUtils.BackupFormat.JSON;
-                        } else {
-                            format = DataUtils.BackupFormat.TEXT;
-                        }
-                        Log.i(this.getClass().getSimpleName(), formatString);
-                        listener.onExportZipPasswordSet(password1.getText().toString(), format);
+                        listener.onExportZipPasswordSet(password1.getText().toString(), DataUtils.BackupFormat.JSON);
                     }
                 })
-                .setNegativeButton(R.string.cancel, (dialog, id) -> ExportZipDialogFragment.this.getDialog().cancel());
+                .setNegativeButton(R.string.cancel, (dialog, id) -> dismiss());
         return builder.create();
     }
 

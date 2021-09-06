@@ -74,6 +74,7 @@ public class ExportZipDialogFragment extends DialogFragment {
                     if (listener != null) {
                         String formatString = formatSpinner.getSelectedItem().toString();
                         DataUtils.BackupFormat format;
+                        // Be very careful here, because formatString is localized, only JSON is spelled the same in all supported languages
                         if (formatString.equalsIgnoreCase(DataUtils.BackupFormat.JSON.name())) {
                             format = DataUtils.BackupFormat.JSON;
                         } else {

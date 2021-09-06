@@ -279,7 +279,10 @@ public class SettingsActivity extends AppCompatActivity implements
         backupRestoreFileSelectedLauncher.launch(MIME_ZIP);
     }
 
-    private void onBackupRestoreFileSelected(final Uri result) {
+    private void onBackupRestoreFileSelected(final Uri backupFileUri) {
+        if (backupFileUri == null) // No file was selected
+            return;
+
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(getString(R.string.enter_backup_password));
 
@@ -288,7 +291,7 @@ public class SettingsActivity extends AppCompatActivity implements
         builder.setView(input);
 
         builder.setPositiveButton(R.string.open_backup_file,
-                (dialog, which) -> onBackupFileOpened(result, input.getText().toString().trim().toCharArray()));
+                (dialog, which) -> onBackupFileOpened(backupFileUri, input.getText().toString().trim().toCharArray()));
         builder.setNegativeButton(getString(R.string.cancel), (dialog, which) -> dialog.cancel());
 
         builder.show();

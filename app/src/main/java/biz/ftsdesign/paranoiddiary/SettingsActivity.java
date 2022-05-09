@@ -142,8 +142,14 @@ public class SettingsActivity extends AppCompatActivity implements
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle(getString(R.string.what_do_you_want_to_do_with_backup));
 
-            builder.setPositiveButton(getString(R.string.share), (dialog, which) -> doShareZip(zipFileName));
-            builder.setNegativeButton(getString(R.string.save), (dialog, which) -> doChooseSaveZipLocation(zipFileName));
+            builder.setPositiveButton(getString(R.string.share), (dialog, which) -> {
+                dialog.dismiss();
+                doShareZip(zipFileName);
+            });
+            builder.setNegativeButton(getString(R.string.save), (dialog, which) -> {
+                dialog.dismiss();
+                doChooseSaveZipLocation(zipFileName);
+            });
             builder.setNeutralButton(getString(R.string.cancel), (dialog, which) -> {
                 dialog.cancel();
                 encryptedZipData = null;

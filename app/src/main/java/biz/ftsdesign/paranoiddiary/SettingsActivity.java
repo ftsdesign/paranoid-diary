@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -236,6 +238,11 @@ public class SettingsActivity extends AppCompatActivity implements
             sendIntent.putExtra(Intent.EXTRA_STREAM, uri);
             sendIntent.setType(MIME_ZIP);
             Intent shareIntent = Intent.createChooser(sendIntent, null);
+            List<ResolveInfo> resInfoList = this.getPackageManager().queryIntentActivities(shareIntent, PackageManager.MATCH_DEFAULT_ONLY);
+            for (ResolveInfo resolveInfo : resInfoList) {
+                String packageName = resolveInfo.activityInfo.packageName;
+                this.grantUriPermission(packageName, uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            }
             startActivity(shareIntent);
 
             recordBackupTime();

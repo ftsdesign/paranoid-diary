@@ -149,7 +149,7 @@ public class WriteActivity extends AppCompatActivity implements ModifyTagsListen
             final long timeSinceLastSavedMs = now - lastSaved;
             if (timeSinceLastSavedMs > MIN_AUTOSAVE_INTERVAL_MS) {
                 // Enough time has passed since last save, can save immediately
-                saveCurrentRecord(record);
+                saveCurrentRecord(record, false);
 
             } else {
                 // Schedule save later, if not already scheduled
@@ -157,7 +157,7 @@ public class WriteActivity extends AppCompatActivity implements ModifyTagsListen
                     saveTextOnUpdateTimerTask = new TimerTask() {
                         @Override
                         public void run() {
-                            saveCurrentRecord(record);
+                            saveCurrentRecord(record, false);
                             saveTextOnUpdateTimerTask = null;
                         }
                     };
@@ -198,7 +198,7 @@ public class WriteActivity extends AppCompatActivity implements ModifyTagsListen
             }
 
             addRecordTagsFromText(record);
-            saved = saveCurrentRecord(record);
+            saved = saveCurrentRecord(record, true);
             Util.toastLong(this, "Record " + (saved ? "saved" : "NOT SAVED"));
         }
     }
@@ -222,8 +222,12 @@ public class WriteActivity extends AppCompatActivity implements ModifyTagsListen
     /**
      * This method only updates the text, timestamp and explicitly defined tags.
      * Can be called from onFinishedWriting or from autosave.
+     * @param record Record to save
+     * @param deleteIfEmpty Delete the whole record if it has no text. It is ok for a record to have
+     *                      no text while it is still being edited and saved via autosave, but
+     *                      not for the final state when called from onFinishedWriting.
      */
-    private synchronized boolean saveCurrentRecord(@Nullable final Record record) {
+    private synchronized boolean saveCurrentRecord(@Nullable final Record record, boolean deleteIfEmpty) {
         boolean saved = false;
         if (dataStorageService != null && record != null) {
             try {
@@ -233,10 +237,12 @@ public class WriteActivity extends AppCompatActivity implements ModifyTagsListen
                     saved = true;
 
                 } else {
-                    String msg = "Record #" + record.getId() + " has no text, deleting";
-                    Log.i(WriteActivity.class.getSimpleName(), msg);
-                    dataStorageService.deleteRecordAndTagMappings(record.getId());
-                    Util.toastLong(this, "Record has no text, deleting");
+                    if (deleteIfEmpty) {
+                        String msg = "Record #" + record.getId() + " has no text, deleting";
+                        Log.i(WriteActivity.class.getSimpleName(), msg);
+                        dataStorageService.deleteRecordAndTagMappings(record.getId());
+                        Util.toastLong(this, "Record has no text, deleting");
+                    }
                 }
                 lastSaved = System.currentTimeMillis();
 

@@ -36,7 +36,8 @@
         app:layout_constrainedWidth="true"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewRecordHeader" />
+        app:layout_constraintTop_toBottomOf="@+id/textViewRecordHeader"
+        android:focusable="true" />
 
     <com.google.android.flexbox.FlexboxLayout
         android:id="@+id/tagsBox"
